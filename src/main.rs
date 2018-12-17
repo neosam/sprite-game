@@ -1,4 +1,5 @@
 extern crate amethyst;
+extern crate nalgebra as na;
 
 use amethyst::{
     core::transform::{Transform, TransformBundle},
@@ -15,6 +16,7 @@ mod spriteanimation;
 mod charactermove;
 mod charactermeta;
 mod characteranimation;
+mod physics;
 
 struct Example;
 
@@ -117,6 +119,7 @@ fn initialize_test_sprite(world: &mut World) {
         .with(charactermove::CharacterMove::new(128.0))
         .with(character_meta)
         .with(character_animation)
+        .with(physics::Physics::new())
         .build();
 
 
@@ -185,6 +188,7 @@ fn main() -> amethyst::Result<()> {
             .with_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
             .with_bundle(TransformBundle::new())?
             .with_bundle(input_bundle)?
+            .with(physics::PhysicsSystem, "physics", &[])
             .with(spriteanimation::SpriteAnimationSystem, "sprite_animation", &[])
             .with(charactermove::CharacterMoveSystem, "character_move", &[])
             .with(characteranimation::CharacterAnimationSystem, "character_animation", &["sprite_animation", "character_move"]);
