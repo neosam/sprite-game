@@ -4,6 +4,9 @@ use amethyst::input::InputHandler;
 use amethyst::core::timing::Time;
 use amethyst::ecs::{Component, DenseVecStorage};
 
+
+use crate::charactermeta::{CharacterMeta, CharacterDirection};
+
 pub struct CharacterMove {
     pub speed: f32
 }
@@ -23,13 +26,14 @@ pub struct CharacterMoveSystem;
 impl<'s> System<'s> for CharacterMoveSystem {
     type SystemData = (
         WriteStorage<'s, Transform>,
+        WriteStorage<'s, CharacterMeta>,
         ReadStorage<'s, CharacterMove>,
         Read<'s, InputHandler<String, String>>,
         Read<'s, Time>,
     );
 
-    fn run(&mut self, (mut transforms, character_moves, input, time): Self::SystemData) {
-        for (transform, character_move) in (&mut transforms, &character_moves).join() {
+    fn run(&mut self, (mut transforms, mut character_meta, character_moves, input, time): Self::SystemData) {
+        for (transform, character_meta, character_move) in (&mut transforms, &mut character_meta, &character_moves).join() {
             transform.translate_x(
                 input.axis_value("player_move_x").unwrap() as f32
                  * time.delta_seconds()
@@ -38,6 +42,16 @@ impl<'s> System<'s> for CharacterMoveSystem {
                 input.axis_value("player_move_y").unwrap() as f32
                  * time.delta_seconds()
                  * character_move.speed);
+                
+            if input.axis_value("player_move_x").unwrap() > 0.0 {
+                character_meta.direction = CharacterDirection::Right
+            } else if input.axis_value("player_move_x").unwrap() < 0.0 {
+                character_meta.direction = CharacterDirection::Left
+            } else if input.axis_value("player_move_y").unwrap() > 0.0 {
+                character_meta.direction = CharacterDirection::Up
+            } else if input.axis_value("player_move_y").unwrap() < 0.0 {
+                character_meta.direction = CharacterDirection::Down
+            }
         }
     }
 }

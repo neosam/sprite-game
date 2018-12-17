@@ -13,6 +13,8 @@ use amethyst::{
 
 mod spriteanimation;
 mod charactermove;
+mod charactermeta;
+mod characteranimation;
 
 struct Example;
 
@@ -83,8 +85,23 @@ fn initialize_test_sprite(world: &mut World) {
         sprite_number: 0, // paddle is the first sprite in the sprite_sheet
     };
 
-    let indices = vec![0, 1, 2];
-    let sprite_animation = spriteanimation::SpriteAnimation::new(indices, 0.1);
+    let walk_down = vec![0, 1, 2];
+    let walk_up = vec![3, 4, 5];
+    let walk_right = vec![6, 7, 8];
+    let walk_left = vec![9, 10, 11];
+    let sprite_animation = spriteanimation::SpriteAnimation::new(walk_down.clone(), 0.1);
+
+    let character_animation = characteranimation::CharacterAnimation {
+        prev_direction: charactermeta::CharacterDirection::Down,
+        walk_up_animation: walk_up.clone(),
+        walk_down_animation: walk_down.clone(),
+        walk_left_animation: walk_left.clone(),
+        walk_right_animation: walk_right.clone(),
+    };
+
+    let character_meta = charactermeta::CharacterMeta {
+        direction: charactermeta::CharacterDirection::Down
+    };
 
     world.create_entity()
         .with(sprite_render)
@@ -92,6 +109,8 @@ fn initialize_test_sprite(world: &mut World) {
         .with(sprite_animation)
         .with(Transparent)
         .with(charactermove::CharacterMove::new(128.0))
+        .with(character_meta)
+        .with(character_animation)
         .build();
 }
 
@@ -128,7 +147,8 @@ fn main() -> amethyst::Result<()> {
             .with_bundle(TransformBundle::new())?
             .with_bundle(input_bundle)?
             .with(spriteanimation::SpriteAnimationSystem, "sprite_animation", &[])
-            .with(charactermove::CharacterMoveSystem, "character_move", &[]);
+            .with(charactermove::CharacterMoveSystem, "character_move", &[])
+            .with(characteranimation::CharacterAnimationSystem, "character_animation", &["sprite_animation", "character_move"]);
     let mut game = Application::new("./", Example, game_data)?;
 
     game.run();

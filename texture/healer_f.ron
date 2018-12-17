@@ -20,5 +20,65 @@
             width: 32,
             height: 36,
         ),
+
+
+        (
+            x: 0,
+            y: 0,
+            width: 32,
+            height: 36,
+        ),
+        (
+            x: 32,
+            y: 0,
+            width: 32,
+            height: 36,
+        ),
+        (
+            x: 64,
+            y: 0,
+            width: 32,
+            height: 36,
+        ),
+
+
+        (
+            x: 0,
+            y: 36,
+            width: 32,
+            height: 36,
+        ),
+        (
+            x: 32,
+            y: 36,
+            width: 32,
+            height: 36,
+        ),
+        (
+            x: 64,
+            y: 36,
+            width: 32,
+            height: 36,
+        ),
+
+
+        (
+            x: 0,
+            y: 108,
+            width: 32,
+            height: 36,
+        ),
+        (
+            x: 32,
+            y: 108,
+            width: 32,
+            height: 36,
+        ),
+        (
+            x: 64,
+            y: 108,
+            width: 32,
+            height: 36,
+        ),
     ],
 )
