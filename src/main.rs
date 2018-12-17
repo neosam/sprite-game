@@ -8,14 +8,18 @@ use amethyst::{
                Projection, Texture, TextureMetadata, PngFormat, SpriteSheet, SpriteSheetFormat,
                SpriteRender, Transparent, ColorMask, ALPHA},
     utils::application_root_dir,
+    input::InputBundle,
 };
 
 mod spriteanimation;
+mod charactermove;
 
 struct Example;
 
 pub const ARENA_WIDTH: f32 = 500.0;
 pub const ARENA_HEIGHT: f32 = 500.0;
+
+
 
 impl SimpleState for Example {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
@@ -87,7 +91,12 @@ fn initialize_test_sprite(world: &mut World) {
         .with(transform)
         .with(sprite_animation)
         .with(Transparent)
+        .with(charactermove::CharacterMove::new(128.0))
         .build();
+}
+
+fn initialize_keyboard(world: &mut World) {
+
 }
 
 fn main() -> amethyst::Result<()> {
@@ -97,7 +106,14 @@ fn main() -> amethyst::Result<()> {
         "{}/resources/display_config.ron",
         application_root_dir()
     );
+    let binding_path = format!(
+        "{}/resources/binding_config.ron",
+        application_root_dir()
+    );
     let config = DisplayConfig::load(&path);
+
+    let input_bundle = InputBundle::<String, String>::new()
+        .with_bindings_from_file(binding_path)?;
 
     let pipe = Pipeline::build().with_stage(
         Stage::with_backbuffer()
@@ -110,7 +126,9 @@ fn main() -> amethyst::Result<()> {
         GameDataBuilder::default()
             .with_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
             .with_bundle(TransformBundle::new())?
-            .with(spriteanimation::SpriteAnimationSystem, "sprite_animation", &[]);
+            .with_bundle(input_bundle)?
+            .with(spriteanimation::SpriteAnimationSystem, "sprite_animation", &[])
+            .with(charactermove::CharacterMoveSystem, "character_move", &[]);
     let mut game = Application::new("./", Example, game_data)?;
 
     game.run();
