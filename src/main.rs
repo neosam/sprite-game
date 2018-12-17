@@ -68,6 +68,8 @@ fn initialize_test_sprite(world: &mut World) {
         )
     };
 
+    
+
     let sprite_sheet_handle = {
         let loader = world.read_resource::<Loader>();
         let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
@@ -79,6 +81,8 @@ fn initialize_test_sprite(world: &mut World) {
             &sprite_sheet_store,
         )
     };
+
+    
 
     let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
@@ -113,6 +117,43 @@ fn initialize_test_sprite(world: &mut World) {
         .with(charactermove::CharacterMove::new(128.0))
         .with(character_meta)
         .with(character_animation)
+        .build();
+
+
+
+    // Add a bush
+    let ground_texture_handle = {
+        let loader = world.read_resource::<Loader>();
+        let texture_storage = world.read_resource::<AssetStorage<Texture>>();
+        loader.load(
+            "texture/Ground0.png",
+            PngFormat,
+            TextureMetadata::srgb_scale(),
+            (),
+            &texture_storage,
+        )
+    };
+    let ground_sprite_sheet_handle = {
+        let loader = world.read_resource::<Loader>();
+        let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
+        loader.load(
+            "texture/Ground0.ron", // Here we load the associated ron file
+            SpriteSheetFormat,
+            ground_texture_handle, // We pass it the texture we want it to use
+            (),
+            &sprite_sheet_store,
+        )
+    };
+    let ground_sprite_render = SpriteRender {
+        sprite_sheet: ground_sprite_sheet_handle.clone(),
+        sprite_number: 0,
+    };
+    let mut ground_transform = Transform::default();
+    ground_transform.set_xyz(60.0, 60.0, 0.0);
+
+    world.create_entity()
+        .with(ground_sprite_render)
+        .with(ground_transform)
         .build();
 }
 
