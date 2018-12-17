@@ -6,7 +6,7 @@ use amethyst::{
     prelude::*,
     renderer::{Camera, DisplayConfig, DrawFlat2D, Pipeline, PosNormTex, RenderBundle, Stage,
                Projection, Texture, TextureMetadata, PngFormat, SpriteSheet, SpriteSheetFormat,
-               SpriteRender},
+               SpriteRender, Transparent, ColorMask, ALPHA},
     utils::application_root_dir,
 };
 
@@ -14,14 +14,15 @@ mod spriteanimation;
 
 struct Example;
 
-pub const ARENA_WIDTH: f32 = 100.0;
-pub const ARENA_HEIGHT: f32 = 100.0;
+pub const ARENA_WIDTH: f32 = 500.0;
+pub const ARENA_HEIGHT: f32 = 500.0;
 
 impl SimpleState for Example {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
 
         //world.register::<SpriteRender>();
+        world.register::<Transparent>();
 
         initialise_camera(world);
         initialize_test_sprite(world);
@@ -47,13 +48,13 @@ fn initialise_camera(world: &mut World) {
 
 fn initialize_test_sprite(world: &mut World) {
     let mut transform = Transform::default();
-    transform.set_xyz(10.0, 10.0, 0.0);
+    transform.set_xyz(250.0, 250.0, 0.0);
 
     let texture_handle = {
         let loader = world.read_resource::<Loader>();
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         loader.load(
-            "texture/pong_spritesheet.png",
+            "texture/healer_f.png",
             PngFormat,
             TextureMetadata::srgb_scale(),
             (),
@@ -65,7 +66,7 @@ fn initialize_test_sprite(world: &mut World) {
         let loader = world.read_resource::<Loader>();
         let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
         loader.load(
-            "texture/pong_spritesheet.ron", // Here we load the associated ron file
+            "texture/healer_f.ron", // Here we load the associated ron file
             SpriteSheetFormat,
             texture_handle, // We pass it the texture we want it to use
             (),
@@ -78,13 +79,14 @@ fn initialize_test_sprite(world: &mut World) {
         sprite_number: 0, // paddle is the first sprite in the sprite_sheet
     };
 
-    let indices = vec![0,1];
-    let sprite_animation = spriteanimation::SpriteAnimation::new(indices, 0.5);
+    let indices = vec![0, 1, 2];
+    let sprite_animation = spriteanimation::SpriteAnimation::new(indices, 0.1);
 
     world.create_entity()
         .with(sprite_render)
         .with(transform)
         .with(sprite_animation)
+        .with(Transparent)
         .build();
 }
 
@@ -100,7 +102,8 @@ fn main() -> amethyst::Result<()> {
     let pipe = Pipeline::build().with_stage(
         Stage::with_backbuffer()
             .clear_target([0., 0., 0., 1.0], 1.0)
-            .with_pass(DrawFlat2D::new()),
+            .with_pass(DrawFlat2D::new()
+                .with_transparency(ColorMask::all(), ALPHA, None)),
     );
 
     let game_data =
