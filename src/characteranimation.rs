@@ -9,7 +9,7 @@ use crate::charactermeta::CharacterDirection;
 use crate::spriteanimation::SpriteAnimation;
 
 pub struct CharacterAnimation {
-    pub prev_direction: crate::charactermeta::CharacterDirection,
+    pub prev_character_meta: crate::charactermeta::CharacterMeta,
     pub walk_up_animation: Vec<usize>,
     pub walk_down_animation: Vec<usize>,
     pub walk_left_animation: Vec<usize>,
@@ -32,8 +32,8 @@ impl<'s> System<'s> for CharacterAnimationSystem {
     fn run(&mut self, (mut character_animations, character_metas, mut sprite_animations): Self::SystemData) {
         for (mut character_animation, character_meta, mut sprite_animation) 
                 in (&mut character_animations, &character_metas, &mut sprite_animations).join() {
-            if character_animation.prev_direction != character_meta.direction {
-                character_animation.prev_direction = character_meta.direction;
+            if character_animation.prev_character_meta != *character_meta {
+                character_animation.prev_character_meta = character_meta.clone();
                 let new_animation = match character_meta.direction {
                     CharacterDirection::Up => character_animation.walk_up_animation.clone(),
                     CharacterDirection::Down => character_animation.walk_down_animation.clone(),
@@ -42,6 +42,7 @@ impl<'s> System<'s> for CharacterAnimationSystem {
                 };
                 sprite_animation.index = 0;
                 sprite_animation.keys = new_animation;
+                sprite_animation.pause = !character_meta.moving;
             }
         }
     }

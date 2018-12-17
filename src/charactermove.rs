@@ -44,13 +44,19 @@ impl<'s> System<'s> for CharacterMoveSystem {
                  * character_move.speed);
                 
             if input.axis_value("player_move_x").unwrap() > 0.0 {
-                character_meta.direction = CharacterDirection::Right
+                character_meta.direction = CharacterDirection::Right;
+                character_meta.moving = true;
             } else if input.axis_value("player_move_x").unwrap() < 0.0 {
-                character_meta.direction = CharacterDirection::Left
+                character_meta.direction = CharacterDirection::Left;
+                character_meta.moving = true;
             } else if input.axis_value("player_move_y").unwrap() > 0.0 {
-                character_meta.direction = CharacterDirection::Up
+                character_meta.direction = CharacterDirection::Up;
+                character_meta.moving = true;
             } else if input.axis_value("player_move_y").unwrap() < 0.0 {
-                character_meta.direction = CharacterDirection::Down
+                character_meta.direction = CharacterDirection::Down;
+                character_meta.moving = true;
+            } else {
+                character_meta.moving = false;
             }
         }
     }

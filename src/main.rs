@@ -89,20 +89,23 @@ fn initialize_test_sprite(world: &mut World) {
     let walk_up = vec![3, 4, 5];
     let walk_right = vec![6, 7, 8];
     let walk_left = vec![9, 10, 11];
-    let sprite_animation = spriteanimation::SpriteAnimation::new(walk_down.clone(), 0.1);
+    let mut sprite_animation = spriteanimation::SpriteAnimation::new(walk_down.clone(), 0.1);
+    sprite_animation.pause = true;
+
+    let character_meta = charactermeta::CharacterMeta {
+        direction: charactermeta::CharacterDirection::Down,
+        moving: false
+    };
 
     let character_animation = characteranimation::CharacterAnimation {
-        prev_direction: charactermeta::CharacterDirection::Down,
+        prev_character_meta: character_meta.clone(),
         walk_up_animation: walk_up.clone(),
         walk_down_animation: walk_down.clone(),
         walk_left_animation: walk_left.clone(),
         walk_right_animation: walk_right.clone(),
     };
 
-    let character_meta = charactermeta::CharacterMeta {
-        direction: charactermeta::CharacterDirection::Down
-    };
-
+    
     world.create_entity()
         .with(sprite_render)
         .with(transform)
