@@ -4,7 +4,7 @@ use amethyst::{
     core::transform::{Transform, TransformBundle},
     assets::{Loader, AssetStorage},
     prelude::*,
-    renderer::{Camera, DisplayConfig, DrawFlat2D, Pipeline, PosNormTex, RenderBundle, Stage,
+    renderer::{Camera, DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage,
                Projection, Texture, TextureMetadata, PngFormat, SpriteSheet, SpriteSheetFormat,
                SpriteRender, Transparent, ColorMask, ALPHA},
     utils::application_root_dir,
@@ -82,7 +82,7 @@ fn initialize_test_sprite(world: &mut World) {
 
     let sprite_render = SpriteRender {
         sprite_sheet: sprite_sheet_handle.clone(),
-        sprite_number: 0, // paddle is the first sprite in the sprite_sheet
+        sprite_number: 0,
     };
 
     let walk_down = vec![0, 1, 2];
@@ -92,10 +92,9 @@ fn initialize_test_sprite(world: &mut World) {
     let mut sprite_animation = spriteanimation::SpriteAnimation::new(walk_down.clone(), 0.1);
     sprite_animation.pause = true;
 
-    let character_meta = charactermeta::CharacterMeta {
-        direction: charactermeta::CharacterDirection::Down,
-        moving: false
-    };
+    let character_meta = charactermeta::CharacterMeta::new(
+        charactermeta::CharacterDirection::Down,
+    );
 
     let character_animation = characteranimation::CharacterAnimation {
         prev_character_meta: character_meta.clone(),
@@ -115,10 +114,6 @@ fn initialize_test_sprite(world: &mut World) {
         .with(character_meta)
         .with(character_animation)
         .build();
-}
-
-fn initialize_keyboard(world: &mut World) {
-
 }
 
 fn main() -> amethyst::Result<()> {
