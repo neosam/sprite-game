@@ -7,7 +7,7 @@ use amethyst::{
     prelude::*,
     renderer::{Camera, DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage,
                Projection, Texture, TextureMetadata, PngFormat, SpriteSheet, SpriteSheetFormat,
-               SpriteRender, Transparent, ColorMask, ALPHA},
+               SpriteRender, Transparent, ColorMask, ALPHA, DepthMode, TargetBuilder},
     utils::application_root_dir,
     input::InputBundle,
 };
@@ -40,7 +40,7 @@ impl SimpleState for Example {
 /// Initialise the camera.
 fn initialise_camera(world: &mut World) {
     let mut transform = Transform::default();
-    transform.set_xyz(0.0, 0.0, 1.0);
+    transform.set_xyz(0.0, 0.0, 1000.0);
 
     world
         .create_entity()
@@ -56,7 +56,7 @@ fn initialise_camera(world: &mut World) {
 
 fn initialize_test_sprite(world: &mut World) {
     let mut transform = Transform::default();
-    transform.set_xyz(250.0, 250.0, 0.0);
+    transform.set_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
 
     let texture_handle = {
         let loader = world.read_resource::<Loader>();
@@ -120,6 +120,7 @@ fn initialize_test_sprite(world: &mut World) {
         .with(character_meta)
         .with(character_animation)
         .with(physics::Physics::new())
+        .with(physics::BoundingRect::new(-16.0, 16.0, -18.0, 0.0))
         .build();
 
 
@@ -152,11 +153,14 @@ fn initialize_test_sprite(world: &mut World) {
         sprite_number: 0,
     };
     let mut ground_transform = Transform::default();
-    ground_transform.set_xyz(60.0, 60.0, 0.0);
+    ground_transform.set_xyz(100.0, 100.0, -100.0);
 
     world.create_entity()
         .with(ground_sprite_render)
         .with(ground_transform)
+        .with(physics::BoundingRect::new(-8.0, 8.0, -8.0, 8.0))
+        .with(Transparent)
+        .with(physics::Solid)
         .build();
 }
 
@@ -176,11 +180,13 @@ fn main() -> amethyst::Result<()> {
     let input_bundle = InputBundle::<String, String>::new()
         .with_bindings_from_file(binding_path)?;
 
-    let pipe = Pipeline::build().with_stage(
+    let pipe = Pipeline::build().with_target(
+        TargetBuilder::new("asdf").with_depth_buf(true)
+    ).with_stage(
         Stage::with_backbuffer()
             .clear_target([0., 0., 0., 1.0], 1.0)
             .with_pass(DrawFlat2D::new()
-                .with_transparency(ColorMask::all(), ALPHA, None)),
+                .with_transparency(ColorMask::all(), ALPHA, Some(DepthMode::LessEqualTest)))
     );
 
     let game_data =
