@@ -61,58 +61,15 @@ fn initialize_test_sprite(world: &mut World) {
     let mut transform = Transform::default();
     transform.set_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
 
-    // ---- Loading animations
-    let animations_path = format!(
-        "{}/texture/animations.ron",
-        application_root_dir()
-    );
-    let animations = spriteanimationloader::AnimationData::load(animations_path);
-    let texture_handle = {
-        let loader = world.read_resource::<Loader>();
-        let texture_storage = world.read_resource::<AssetStorage<Texture>>();
-        loader.load(
-            animations.texture_path,
-            PngFormat,
-            TextureMetadata::srgb_scale(),
-            (),
-            &texture_storage,
-        )
-    };
-    let mut sprites = Vec::with_capacity(animations.sprites.len());
-    for sprite in animations.sprites {
-        let offset = if let Some((offset_x, offset_y)) = sprite.offset {
-            [offset_x, offset_y]
-        } else {
-            [0.5; 2]
-        };
-        sprites.push(Sprite::from_pixel_values(
-            animations.texture_width,
-            animations.texture_height,
-            sprite.width, sprite.height, sprite.x, sprite.y, offset));
-    }
-    let sprite_sheet = SpriteSheet {
-        texture: texture_handle,
-        sprites
-    };
-
-    let sprite_sheet_handle = {
-        let loader = world.read_resource::<Loader>();
-        loader.load_from_data(
-            sprite_sheet,
-            (),
-            &world.read_resource::<AssetStorage<SpriteSheet>>(),
-        )
-    };
-
-    
+    let sprite_animations = spriteanimationloader::load_sprites(world, "texture/animations.ron");
 
     let sprite_render = SpriteRender {
-        sprite_sheet: sprite_sheet_handle.clone(),
+        sprite_sheet: sprite_animations.sprite_sheet_handle.clone(),
         sprite_number: 0,
     };
 
     let mut sprite_animation = spriteanimation::SpriteAnimation::new(
-        animations.animations.get("healer_walk_top").unwrap().clone(), 0.1);
+        sprite_animations.animations.get("healer_walk_top").unwrap().clone(), 0.1);
     sprite_animation.pause = true;
 
     let character_meta = charactermeta::CharacterMeta::new(
@@ -121,10 +78,10 @@ fn initialize_test_sprite(world: &mut World) {
 
     let character_animation = characteranimation::CharacterAnimation {
         prev_character_meta: character_meta.clone(),
-        walk_up_animation: animations.animations.get("healer_walk_top").unwrap().clone(),
-        walk_down_animation: animations.animations.get("healer_walk_bottom").unwrap().clone(),
-        walk_left_animation: animations.animations.get("healer_walk_left").unwrap().clone(),
-        walk_right_animation: animations.animations.get("healer_walk_right").unwrap().clone(),
+        walk_up_animation: sprite_animations.animations.get("healer_walk_top").unwrap().clone(),
+        walk_down_animation: sprite_animations.animations.get("healer_walk_bottom").unwrap().clone(),
+        walk_left_animation: sprite_animations.animations.get("healer_walk_left").unwrap().clone(),
+        walk_right_animation: sprite_animations.animations.get("healer_walk_right").unwrap().clone(),
     };
 
     
