@@ -7,3 +7,4 @@ edition = "2018"
 [dependencies]
 amethyst = {version="0.10.0", features=["nightly"]}
 nalgebra = "0.16"
+serde = "1.0"

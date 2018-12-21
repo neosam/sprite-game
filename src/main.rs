@@ -1,15 +1,17 @@
 extern crate amethyst;
 extern crate nalgebra as na;
+extern crate serde;
 
 use amethyst::{
     core::transform::{Transform, TransformBundle},
     assets::{Loader, AssetStorage},
     prelude::*,
-    renderer::{Camera, DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage,
+    renderer::{Camera, DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage, Sprite,
                Projection, Texture, TextureMetadata, PngFormat, SpriteSheet, SpriteSheetFormat,
                SpriteRender, Transparent, ColorMask, ALPHA, DepthMode, TargetBuilder},
     utils::application_root_dir,
     input::InputBundle,
+    config::Config,
 };
 
 mod spriteanimation;
@@ -17,6 +19,7 @@ mod charactermove;
 mod charactermeta;
 mod characteranimation;
 mod physics;
+mod spriteanimationloader;
 
 struct Example;
 
@@ -58,29 +61,46 @@ fn initialize_test_sprite(world: &mut World) {
     let mut transform = Transform::default();
     transform.set_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
 
+    // ---- Loading animations
+    let animations_path = format!(
+        "{}/texture/animations.ron",
+        application_root_dir()
+    );
+    let animations = spriteanimationloader::AnimationData::load(animations_path);
     let texture_handle = {
         let loader = world.read_resource::<Loader>();
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         loader.load(
-            "texture/healer_f.png",
+            animations.texture_path,
             PngFormat,
             TextureMetadata::srgb_scale(),
             (),
             &texture_storage,
         )
     };
-
-    
+    let mut sprites = Vec::with_capacity(animations.sprites.len());
+    for sprite in animations.sprites {
+        let offset = if let Some((offset_x, offset_y)) = sprite.offset {
+            [offset_x, offset_y]
+        } else {
+            [0.5; 2]
+        };
+        sprites.push(Sprite::from_pixel_values(
+            animations.texture_width,
+            animations.texture_height,
+            sprite.width, sprite.height, sprite.x, sprite.y, offset));
+    }
+    let sprite_sheet = SpriteSheet {
+        texture: texture_handle,
+        sprites
+    };
 
     let sprite_sheet_handle = {
         let loader = world.read_resource::<Loader>();
-        let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
-        loader.load(
-            "texture/healer_f.ron", // Here we load the associated ron file
-            SpriteSheetFormat,
-            texture_handle, // We pass it the texture we want it to use
+        loader.load_from_data(
+            sprite_sheet,
             (),
-            &sprite_sheet_store,
+            &world.read_resource::<AssetStorage<SpriteSheet>>(),
         )
     };
 
@@ -91,11 +111,8 @@ fn initialize_test_sprite(world: &mut World) {
         sprite_number: 0,
     };
 
-    let walk_down = vec![0, 1, 2];
-    let walk_up = vec![3, 4, 5];
-    let walk_right = vec![6, 7, 8];
-    let walk_left = vec![9, 10, 11];
-    let mut sprite_animation = spriteanimation::SpriteAnimation::new(walk_down.clone(), 0.1);
+    let mut sprite_animation = spriteanimation::SpriteAnimation::new(
+        animations.animations.get("healer_walk_top").unwrap().clone(), 0.1);
     sprite_animation.pause = true;
 
     let character_meta = charactermeta::CharacterMeta::new(
@@ -104,10 +121,10 @@ fn initialize_test_sprite(world: &mut World) {
 
     let character_animation = characteranimation::CharacterAnimation {
         prev_character_meta: character_meta.clone(),
-        walk_up_animation: walk_up.clone(),
-        walk_down_animation: walk_down.clone(),
-        walk_left_animation: walk_left.clone(),
-        walk_right_animation: walk_right.clone(),
+        walk_up_animation: animations.animations.get("healer_walk_top").unwrap().clone(),
+        walk_down_animation: animations.animations.get("healer_walk_bottom").unwrap().clone(),
+        walk_left_animation: animations.animations.get("healer_walk_left").unwrap().clone(),
+        walk_right_animation: animations.animations.get("healer_walk_right").unwrap().clone(),
     };
 
     
@@ -175,7 +192,16 @@ fn main() -> amethyst::Result<()> {
         "{}/resources/binding_config.ron",
         application_root_dir()
     );
+
+
+
     let config = DisplayConfig::load(&path);
+
+
+
+
+
+    //println!("Loaded animations: {:?}", animations);
 
     let input_bundle = InputBundle::<String, String>::new()
         .with_bindings_from_file(binding_path)?;
