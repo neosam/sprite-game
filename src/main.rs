@@ -20,6 +20,7 @@ mod charactermeta;
 mod characteranimation;
 mod physics;
 mod spriteanimationloader;
+mod character;
 
 struct Example;
 
@@ -63,41 +64,13 @@ fn initialize_test_sprite(world: &mut World) {
 
     let sprite_animations = spriteanimationloader::load_sprites(world, "texture/animations.ron");
 
-    let sprite_render = SpriteRender {
-        sprite_sheet: sprite_animations.sprite_sheet_handle.clone(),
-        sprite_number: 0,
-    };
-
-    let mut sprite_animation = spriteanimation::SpriteAnimation::new(
-        sprite_animations.animations.get("healer_walk_top").unwrap().clone(), 0.1);
-    sprite_animation.pause = true;
-
-    let character_meta = charactermeta::CharacterMeta::new(
-        charactermeta::CharacterDirection::Down,
-    );
-
-    let character_animation = characteranimation::CharacterAnimation {
-        prev_character_meta: character_meta.clone(),
-        walk_up_animation: sprite_animations.animations.get("healer_walk_top").unwrap().clone(),
-        walk_down_animation: sprite_animations.animations.get("healer_walk_bottom").unwrap().clone(),
-        walk_left_animation: sprite_animations.animations.get("healer_walk_left").unwrap().clone(),
-        walk_right_animation: sprite_animations.animations.get("healer_walk_right").unwrap().clone(),
-    };
-
-    
-    world.create_entity()
-        .with(sprite_render)
-        .with(transform)
-        .with(sprite_animation)
-        .with(Transparent)
-        .with(charactermove::CharacterMove::new(128.0))
-        .with(character_meta)
-        .with(character_animation)
-        .with(physics::Physics::new())
-        .with(physics::BoundingRect::new(-16.0, 16.0, -18.0, 0.0))
+    character::create_character(
+            world.create_entity(),
+            &sprite_animations,
+            transform,
+            physics::BoundingRect::new(-16.0, 16.0, -18.0, 0.0),
+            "healer")
         .build();
-
-
 
     // Add a bush
     let ground_texture_handle = {

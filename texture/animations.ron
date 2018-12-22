@@ -83,8 +83,8 @@ AnimationData(
         ),
     ],
     animations: {
-        "healer_walk_top": [3, 4, 5],
-        "healer_walk_bottom": [0, 1, 2],
+        "healer_walk_up": [3, 4, 5],
+        "healer_walk_down": [0, 1, 2],
         "healer_walk_right": [6, 7, 8],
         "healer_walk_left": [9, 10, 11],
     }

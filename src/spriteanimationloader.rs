@@ -41,12 +41,12 @@ impl Default for AnimationData {
     }
 }
 
-pub struct SpriteAnimation {
+pub struct SpriteAnimationStore {
     pub sprite_sheet_handle: SpriteSheetHandle,
     pub animations: BTreeMap<String, Vec<usize>>,
 }
 
-pub fn load_sprites<S: ToString>(world: &mut World, path: S) -> SpriteAnimation {
+pub fn load_sprites<S: ToString>(world: &mut World, path: S) -> SpriteAnimationStore {
     // ---- Loading animations
     let animations_path = path.to_string();
     let animations = AnimationData::load(animations_path);
@@ -87,7 +87,7 @@ pub fn load_sprites<S: ToString>(world: &mut World, path: S) -> SpriteAnimation 
         )
     };
 
-    SpriteAnimation {
+    SpriteAnimationStore {
         sprite_sheet_handle,
         animations: animations.animations.clone(),
     }
