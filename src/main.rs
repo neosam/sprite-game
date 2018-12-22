@@ -62,7 +62,7 @@ fn initialize_test_sprite(world: &mut World) {
     let mut transform = Transform::default();
     transform.set_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
 
-    let sprite_animations = spriteanimationloader::load_sprites(world, "texture/animations.ron");
+    let sprite_animations = spriteanimationloader::load_sprites(world, "texture", "animations.ron");
 
     character::create_character(
             world.create_entity(),

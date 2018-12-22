@@ -46,15 +46,19 @@ pub struct SpriteAnimationStore {
     pub animations: BTreeMap<String, Vec<usize>>,
 }
 
-pub fn load_sprites<S: ToString>(world: &mut World, path: S) -> SpriteAnimationStore {
+pub fn load_sprites<S: ToString, 
+                    T: ToString>(world: &mut World, directory: S, filename: T) -> SpriteAnimationStore {
     // ---- Loading animations
-    let animations_path = path.to_string();
-    let animations = AnimationData::load(animations_path);
+    let directory = directory.to_string();
+    let filename = filename.to_string();
+    let ron_path = format!("{}/{}", directory, filename);
+    let animations = AnimationData::load(ron_path);
+    let texture_path = format!("{}/{}", directory, animations.texture_path);
     let texture_handle = {
         let loader = world.read_resource::<Loader>();
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         loader.load(
-            animations.texture_path,
+            texture_path,
             PngFormat,
             TextureMetadata::srgb_scale(),
             (),
