@@ -1,98 +1,105 @@
-AnimationData(
-    texture_path: "healer_f.png",
-    texture_width: 96,
-    texture_height: 144,
+(
+    texture_path: "tp-export.png",
+    texture_width: 408,
+    texture_height: 38,
     sprites: [
+        
         (
             name: "healer_walk_down_001",
-            x: 0,
-            y: 72,
+            x: 1,
+            y: 1,
             width: 32,
             height: 36,
         ),
+        
         (
             name: "healer_walk_down_002",
-            x: 32,
-            y: 72,
+            x: 35,
+            y: 1,
             width: 32,
             height: 36,
         ),
+        
         (
             name: "healer_walk_down_003",
-            x: 64,
-            y: 72,
+            x: 69,
+            y: 1,
             width: 32,
             height: 36,
         ),
-
-
-        (
-            name: "healer_walk_up_001",
-            x: 0,
-            y: 0,
-            width: 32,
-            height: 36,
-        ),
-        (
-            name: "healer_walk_up_002",
-            x: 32,
-            y: 0,
-            width: 32,
-            height: 36,
-        ),
-        (
-            name: "healer_walk_up_003",
-            x: 64,
-            y: 0,
-            width: 32,
-            height: 36,
-        ),
-
-
-        (
-            name: "healer_walk_right_001",
-            x: 0,
-            y: 36,
-            width: 32,
-            height: 36,
-        ),
-        (
-            name: "healer_walk_right_002",
-            x: 32,
-            y: 36,
-            width: 32,
-            height: 36,
-        ),
-        (
-            name: "healer_walk_right_003",
-            x: 64,
-            y: 36,
-            width: 32,
-            height: 36,
-        ),
-
-
+        
         (
             name: "healer_walk_left_001",
-            x: 0,
-            y: 108,
+            x: 103,
+            y: 1,
             width: 32,
             height: 36,
         ),
+        
         (
             name: "healer_walk_left_002",
-            x: 32,
-            y: 108,
+            x: 137,
+            y: 1,
             width: 32,
             height: 36,
         ),
+        
         (
             name: "healer_walk_left_003",
-            x: 64,
-            y: 108,
+            x: 171,
+            y: 1,
             width: 32,
             height: 36,
         ),
+        
+        (
+            name: "healer_walk_right_001",
+            x: 205,
+            y: 1,
+            width: 32,
+            height: 36,
+        ),
+        
+        (
+            name: "healer_walk_right_002",
+            x: 239,
+            y: 1,
+            width: 32,
+            height: 36,
+        ),
+        
+        (
+            name: "healer_walk_right_003",
+            x: 273,
+            y: 1,
+            width: 32,
+            height: 36,
+        ),
+        
+        (
+            name: "healer_walk_up_001",
+            x: 307,
+            y: 1,
+            width: 32,
+            height: 36,
+        ),
+        
+        (
+            name: "healer_walk_up_002",
+            x: 341,
+            y: 1,
+            width: 32,
+            height: 36,
+        ),
+        
+        (
+            name: "healer_walk_up_003",
+            x: 375,
+            y: 1,
+            width: 32,
+            height: 36,
+        ),
+        
     ],
     animations: {},
     images: {},

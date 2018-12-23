@@ -9,10 +9,12 @@ use amethyst::{
 };
 use std::collections::BTreeMap;
 use serde::{Serialize, Deserialize};
+use regex::Regex;
 
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SpriteDefinition {
+    pub name: String,
     pub x: u32,
     pub y: u32,
     pub width: u32,
@@ -26,7 +28,8 @@ pub struct AnimationData {
     pub texture_width: u32,
     pub texture_height: u32,
     pub sprites: Vec<SpriteDefinition>,
-    pub animations: BTreeMap<String, Vec<usize>>
+    pub animations: BTreeMap<String, Vec<usize>>,
+    pub images: BTreeMap<String, usize>,
 }
 
 impl Default for AnimationData {
@@ -36,7 +39,8 @@ impl Default for AnimationData {
             texture_width: 0,
             texture_height: 0,
             sprites: Vec::new(),
-            animations: BTreeMap::new()
+            animations: BTreeMap::new(),
+            images: BTreeMap::new(),
         }
     }
 }
@@ -44,6 +48,27 @@ impl Default for AnimationData {
 pub struct SpriteAnimationStore {
     pub sprite_sheet_handle: SpriteSheetHandle,
     pub animations: BTreeMap<String, Vec<usize>>,
+    pub images: BTreeMap<String, usize>
+}
+
+pub fn manually_assign_animations(animation_data: &mut AnimationData) {
+    let mut animations : BTreeMap<String, Vec<usize>> = BTreeMap::new();
+    let mut images : BTreeMap<String, usize> = BTreeMap::new();
+
+    let ends_with_number_pattern = Regex::new(r"_\d+$").unwrap();
+    for (i, sprite) in (0..).zip(&animation_data.sprites) {
+        if let Some(_) = ends_with_number_pattern.find(&sprite.name) {
+            let animation_name = ends_with_number_pattern.replace_all(&sprite.name, "");
+            println!("Animation name: {}", animation_name);
+            let entry = animations.entry(animation_name.to_string()).or_insert_with(|| Vec::new());
+            entry.push(i);
+        } else {
+            images.insert(sprite.name.to_string(), i);
+        }
+    }
+
+    animation_data.animations = animations;
+    animation_data.images = images;
 }
 
 pub fn load_sprites<S: ToString, 
@@ -52,7 +77,8 @@ pub fn load_sprites<S: ToString,
     let directory = directory.to_string();
     let filename = filename.to_string();
     let ron_path = format!("{}/{}", directory, filename);
-    let animations = AnimationData::load(ron_path);
+    let mut animations = AnimationData::load(ron_path);
+    manually_assign_animations(&mut animations);
     let texture_path = format!("{}/{}", directory, animations.texture_path);
     let texture_handle = {
         let loader = world.read_resource::<Loader>();
@@ -94,5 +120,6 @@ pub fn load_sprites<S: ToString,
     SpriteAnimationStore {
         sprite_sheet_handle,
         animations: animations.animations.clone(),
+        images: animations.images.clone(),
     }
 }
