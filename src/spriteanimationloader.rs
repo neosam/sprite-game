@@ -1,3 +1,5 @@
+//! Load animations and sprites from a ron file.
+
 use amethyst::{
     prelude::*,
     assets::{Loader, AssetStorage},
@@ -8,7 +10,7 @@ use std::collections::BTreeMap;
 use serde::{Serialize, Deserialize};
 use regex::Regex;
 
-
+/// Definintion of one sprite in the RON file.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SpriteDefinition {
     pub name: String,
@@ -19,6 +21,7 @@ pub struct SpriteDefinition {
     pub offset: Option<(f32, f32)>
 }
 
+/// RON file definition.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct AnimationData {
     pub texture_path: String,
@@ -42,12 +45,19 @@ impl Default for AnimationData {
     }
 }
 
+/// Stores all animations and sprites and sprites which can be used
+/// ingame.
 pub struct SpriteAnimationStore {
     pub sprite_sheet_handle: SpriteSheetHandle,
     pub animations: BTreeMap<String, Vec<usize>>,
     pub images: BTreeMap<String, usize>
 }
 
+/// Use an AnimationData and create animations and sprite images based on sprite names.
+/// 
+/// If a name ends with underscores followed by numbers it is treated as part of an animations.
+/// In this case it will add it to the animations, otherwise it will simply store the index in
+/// the images tree map under that name.
 pub fn manually_assign_animations(animation_data: &mut AnimationData) {
     let mut animations : BTreeMap<String, Vec<usize>> = BTreeMap::new();
     let mut images : BTreeMap<String, usize> = BTreeMap::new();
@@ -68,6 +78,11 @@ pub fn manually_assign_animations(animation_data: &mut AnimationData) {
     animation_data.images = images;
 }
 
+/// Load animations and images from the given ron file.
+/// 
+/// It requires a mutable reference to the world, a directory, where the assets are stored and the filename
+/// of the ron file inside the directory.  The reference to the image file in the ron file is relative to the
+/// directory provides as second argument.
 pub fn load_sprites<S: ToString, 
                     T: ToString>(world: &mut World, directory: S, filename: T) -> SpriteAnimationStore {
     // ---- Loading animations

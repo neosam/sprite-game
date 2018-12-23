@@ -13,13 +13,13 @@ use amethyst::{
     config::Config,
 };
 
-mod spriteanimation;
-mod charactermove;
-mod charactermeta;
-mod characteranimation;
-mod physics;
-mod spriteanimationloader;
-mod helper;
+pub mod spriteanimation;
+pub mod charactermove;
+pub mod charactermeta;
+pub mod characteranimation;
+pub mod physics;
+pub mod spriteanimationloader;
+pub mod helper;
 
 struct Example;
 

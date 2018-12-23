@@ -1,9 +1,14 @@
+//! ECS system to move sprites and respect collisions 
+
 use amethyst::ecs::{Component, DenseVecStorage};
 use na::{Vector2};
 use amethyst::core::Transform;
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
 use amethyst::core::timing::Time;
 
+/// Component which controls the physics of an entity.
+/// 
+/// It holds the speed in units/second for the enitty.
 pub struct Physics {
     pub velocity: Vector2<f32>
 }
@@ -20,6 +25,9 @@ impl Physics {
     }
 }
 
+/// Component which defines the dimension of an entity
+/// 
+/// The dimension of the entity is used for collision detection.
 pub struct BoundingRect {
     pub left: f32,
     pub right: f32,
@@ -37,11 +45,16 @@ impl BoundingRect {
     }
 }
 
+/// Component which defines that an entity is not movable
+/// 
+/// Items which have the Physics Component will collide with
+/// Solid Components.
 pub struct Solid;
 impl Component for Solid {
     type Storage = DenseVecStorage<Self>;
 }
 
+/// Handles movement of Entities and respects collisions.
 pub struct PhysicsSystem;
 
 impl<'s> System<'s> for PhysicsSystem {

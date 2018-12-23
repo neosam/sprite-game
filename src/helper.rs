@@ -1,4 +1,4 @@
-/// Contains helper functions
+//! Contains helper functions
 
 use amethyst::{
     prelude::*,
@@ -20,6 +20,30 @@ use crate::charactermeta::CharacterDirection;
 use crate::characteranimation::CharacterAnimation;
 use crate::charactermove::CharacterMove;
 
+/// Assebles a character on the map
+/// 
+/// Assigns the components to the EntityBuilder which are required
+/// to have a moving character on the screen.
+/// 
+/// For the animations, it requires to have animation names following
+/// this pattern:
+/// * (name)_walk_up
+/// * (name)_walk_down
+/// * (name)_walk_left
+/// * (name)_walk_right
+/// 
+/// ## Examples
+/// ```
+/// use helper::create_character;
+/// 
+/// create_character(
+///         world.create_entity(),
+///         &animations,
+///         (300.0, 300.0),
+///         (-16.0, 16.0, -16.0, 16.0),
+///         "hero"
+/// ).build();
+/// ```
 pub fn create_character<'a>(
         entity_builder: EntityBuilder<'a>,
         animations: &SpriteAnimationStore,
@@ -66,6 +90,25 @@ pub fn create_character<'a>(
         .with(BoundingRect::new(left, right, bottom, top))
 }
 
+/// Assebles a solid entity
+/// 
+/// Assigns the components to the EntityBuilder which are required
+/// to have a solid enity.
+/// 
+/// The name must match the sprite name in.
+/// 
+/// ## Examples
+/// ```
+/// use helper::create_solid;
+/// 
+/// create_solid(
+///         world.create_entity(),
+///         &animations,
+///         (300.0, 300.0),
+///         (-16.0, 16.0, -16.0, 16.0),
+///         "hero"
+/// ).build();
+/// ```
 pub fn create_solid<'a>(
         entity_builder: EntityBuilder<'a>,
         animations: &SpriteAnimationStore,

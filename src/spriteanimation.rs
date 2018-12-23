@@ -1,3 +1,5 @@
+//! Support to handle animations for sprites.
+
 use amethyst::{
     core::timing::Time,
     ecs::{Component, DenseVecStorage},
@@ -5,6 +7,11 @@ use amethyst::{
     renderer::SpriteRender,
 };
 
+/// Component which holds a sprite animation
+/// 
+/// This includes the sprite indices for the animation, the
+/// animation speed, if the animation should pause and other
+/// information required to draw a sprite animation.
 #[derive(Default)]
 pub struct SpriteAnimation {
     pub index: u32,
@@ -30,7 +37,7 @@ impl Component for SpriteAnimation {
     type Storage = DenseVecStorage<Self>;
 }
 
-
+/// System to handle sprite animation.
 pub struct SpriteAnimationSystem;
 
 impl<'s> System<'s> for SpriteAnimationSystem {

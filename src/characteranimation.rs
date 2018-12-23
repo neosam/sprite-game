@@ -1,3 +1,7 @@
+//! ECS to set required animations
+//! 
+//!  
+
 use amethyst::ecs::{Join, ReadStorage, System, WriteStorage};
 use amethyst::ecs::{Component, DenseVecStorage};
 
@@ -5,6 +9,7 @@ use crate::charactermeta::CharacterMeta;
 use crate::charactermeta::CharacterDirection;
 use crate::spriteanimation::SpriteAnimation;
 
+/// Component which contains the sprite animations. 
 pub struct CharacterAnimation {
     pub prev_character_meta: crate::charactermeta::CharacterMeta,
     pub walk_up_animation: Vec<usize>,
@@ -17,7 +22,7 @@ impl Component for CharacterAnimation {
     type Storage = DenseVecStorage<Self>;
 }
 
-
+/// System to set the animations based on the CharacterMeta 
 pub struct CharacterAnimationSystem;
 impl<'s> System<'s> for CharacterAnimationSystem {
     type SystemData = (

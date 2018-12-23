@@ -1,3 +1,5 @@
+//! ECS to handle character movement and input from the user
+
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
 use amethyst::input::InputHandler;
 use amethyst::ecs::{Component, DenseVecStorage};
@@ -6,11 +8,13 @@ use amethyst::ecs::{Component, DenseVecStorage};
 use crate::charactermeta::{CharacterMeta, CharacterDirection};
 use crate::physics::Physics;
 
+/// Ability to let the character move based on user inputs.
 pub struct CharacterMove {
     pub speed: f32
 }
 
 impl CharacterMove {
+    /// Create a new CharacterMove which contains the given speed.
     pub fn new(speed: f32) -> Self {
         CharacterMove { speed }
     }
@@ -20,6 +24,7 @@ impl Component for CharacterMove {
     type Storage = DenseVecStorage<Self>;
 }
 
+/// System to handle user input and set the speed.
 pub struct CharacterMoveSystem;
 
 impl<'s> System<'s> for CharacterMoveSystem {
