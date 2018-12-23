@@ -21,7 +21,7 @@ mod charactermeta;
 mod characteranimation;
 mod physics;
 mod spriteanimationloader;
-mod character;
+mod helper;
 
 struct Example;
 
@@ -62,7 +62,7 @@ fn initialise_camera(world: &mut World) {
 fn initialize_test_sprite(world: &mut World) {
     let sprite_animations = spriteanimationloader::load_sprites(world, "texture", "tp-export.ron");
 
-    character::create_character(
+    helper::create_character(
             world.create_entity(),
             &sprite_animations,
             (ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0),
@@ -71,7 +71,7 @@ fn initialize_test_sprite(world: &mut World) {
         .build();
 
     // Add a brick
-    character::create_solid(
+    helper::create_solid(
             world.create_entity(), 
             &sprite_animations, 
             (100.0, 100.0),
