@@ -8,7 +8,7 @@ use amethyst::ecs::{Component, DenseVecStorage};
 use crate::charactermeta::{CharacterMeta, CharacterDirection};
 use crate::physics::Physics;
 
-/// Ability to let the character move based on user inputs.
+/// Ability to let the character move.
 pub struct CharacterMove {
     pub speed: f32
 }
@@ -24,6 +24,12 @@ impl Component for CharacterMove {
     type Storage = DenseVecStorage<Self>;
 }
 
+/// Component which lets the user control the entity.
+pub struct UserMove;
+impl Component for UserMove {
+    type Storage = DenseVecStorage<Self>;
+}
+
 /// System to handle user input and set the speed.
 pub struct CharacterMoveSystem;
 
@@ -32,11 +38,12 @@ impl<'s> System<'s> for CharacterMoveSystem {
         WriteStorage<'s, Physics>,
         WriteStorage<'s, CharacterMeta>,
         ReadStorage<'s, CharacterMove>,
+        ReadStorage<'s, UserMove>,
         Read<'s, InputHandler<String, String>>,
     );
 
-    fn run(&mut self, (mut physics, mut character_meta, character_moves, input): Self::SystemData) {
-        for (physics, character_meta, character_move) in (&mut physics, &mut character_meta, &character_moves).join() {
+    fn run(&mut self, (mut physics, mut character_meta, character_moves, user_moves, input): Self::SystemData) {
+        for (physics, character_meta, character_move, _) in (&mut physics, &mut character_meta, &character_moves, &user_moves).join() {
             physics.velocity.x =
                 input.axis_value("player_move_x").unwrap() as f32
                  * character_move.speed;

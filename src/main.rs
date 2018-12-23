@@ -67,6 +67,7 @@ fn initialize_test_sprite(world: &mut World) {
             (ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0),
             (-16.0, 16.0, -16.0, 16.0),
             "healer")
+        .with(charactermove::UserMove)
         .build();
 
     // Add a brick
