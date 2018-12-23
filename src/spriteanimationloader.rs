@@ -1,10 +1,7 @@
 use amethyst::{
     prelude::*,
-    core::timing::Time,
     assets::{Loader, AssetStorage},
-    ecs::{Component, DenseVecStorage},
-    ecs::prelude::{Join, Read, System, WriteStorage},
-    renderer::{Sprite, SpriteRender, SpriteSheet, SpriteSheetHandle, PngFormat, Texture, TextureMetadata},
+    renderer::{Sprite, SpriteSheet, SpriteSheetHandle, PngFormat, Texture, TextureMetadata},
     config::Config,
 };
 use std::collections::BTreeMap;

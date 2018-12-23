@@ -5,11 +5,9 @@ extern crate regex;
 
 use amethyst::{
     core::transform::{Transform, TransformBundle},
-    assets::{Loader, AssetStorage},
     prelude::*,
-    renderer::{Camera, DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage, Sprite,
-               Projection, Texture, TextureMetadata, PngFormat, SpriteSheet, SpriteSheetFormat,
-               SpriteRender, Transparent, ColorMask, ALPHA, DepthMode, TargetBuilder},
+    renderer::{Camera, DisplayConfig, DrawFlat2D, Pipeline, RenderBundle, Stage,
+               Projection, Transparent, ColorMask, ALPHA, DepthMode, TargetBuilder},
     utils::application_root_dir,
     input::InputBundle,
     config::Config,
