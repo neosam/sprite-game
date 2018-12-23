@@ -60,28 +60,22 @@ fn initialise_camera(world: &mut World) {
 }
 
 fn initialize_test_sprite(world: &mut World) {
-    let mut transform = Transform::default();
-    transform.set_xyz(ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0, 0.0);
-
     let sprite_animations = spriteanimationloader::load_sprites(world, "texture", "tp-export.ron");
 
     character::create_character(
             world.create_entity(),
             &sprite_animations,
-            transform,
-            physics::BoundingRect::new(-16.0, 16.0, -18.0, 18.0),
+            (ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0),
+            (-16.0, 16.0, -16.0, 16.0),
             "healer")
         .build();
 
     // Add a brick
-    let mut ground_transform = Transform::default();
-    ground_transform.set_xyz(100.0, 100.0, -100.0);
-
     character::create_solid(
             world.create_entity(), 
             &sprite_animations, 
-            ground_transform,
-            physics::BoundingRect::new(-8.0, 8.0, -8.0, 8.0),
+            (100.0, 100.0),
+            (-16.0, 16.0, -16.0, 16.0),
             "brick")
         .build();
 }

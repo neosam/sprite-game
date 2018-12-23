@@ -21,8 +21,8 @@ use crate::charactermove::CharacterMove;
 pub fn create_character<'a>(
         entity_builder: EntityBuilder<'a>,
         animations: &SpriteAnimationStore,
-        transform: Transform,
-        rect: BoundingRect,
+        (x, y): (f32, f32),
+        (left, right, bottom, top): (f32, f32, f32, f32),
         char_name: &str) -> EntityBuilder<'a> {
     println!("Create character start");
     let animation_up = format!("{}_walk_up", char_name);
@@ -47,6 +47,8 @@ pub fn create_character<'a>(
         sprite_sheet: animations.sprite_sheet_handle.clone(),
         sprite_number: 0,
     };
+    let mut transform = Transform::default();
+    transform.set_xyz(x, y, -y);
 
     println!("Create character end");
 
@@ -59,24 +61,26 @@ pub fn create_character<'a>(
         .with(character_meta)
         .with(character_animation)
         .with(Physics::new())
-        .with(rect)
+        .with(BoundingRect::new(left, right, bottom, top))
 }
 
 pub fn create_solid<'a>(
         entity_builder: EntityBuilder<'a>,
         animations: &SpriteAnimationStore,
-        transform: Transform,
-        rect: BoundingRect,
+        (x, y): (f32, f32),
+        (left, right, bottom, top): (f32, f32, f32, f32),
         name: &str) -> EntityBuilder<'a> {
     let sprite_render = SpriteRender {
         sprite_sheet: animations.sprite_sheet_handle.clone(),
         sprite_number: *animations.images.get(name).unwrap_or(&0),
     };
+    let mut transform = Transform::default();
+    transform.set_xyz(x, y, -y);
 
     entity_builder
         .with(sprite_render)
         .with(transform)
-        .with(rect)
+        .with(BoundingRect::new(left, right, bottom, top))
         .with(Transparent)
         .with(Solid)
 }
