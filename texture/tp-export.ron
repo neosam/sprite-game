@@ -1,7 +1,7 @@
 (
     texture_path: "tp-export.png",
-    texture_width: 408,
-    texture_height: 38,
+    texture_width: 34,
+    texture_height: 490,
     sprites: [
         
         (
@@ -14,90 +14,98 @@
         
         (
             name: "healer_walk_down_002",
-            x: 35,
-            y: 1,
+            x: 1,
+            y: 39,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_down_003",
-            x: 69,
-            y: 1,
+            x: 1,
+            y: 77,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_left_001",
-            x: 103,
-            y: 1,
+            x: 1,
+            y: 115,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_left_002",
-            x: 137,
-            y: 1,
+            x: 1,
+            y: 153,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_left_003",
-            x: 171,
-            y: 1,
+            x: 1,
+            y: 191,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_right_001",
-            x: 205,
-            y: 1,
+            x: 1,
+            y: 229,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_right_002",
-            x: 239,
-            y: 1,
+            x: 1,
+            y: 267,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_right_003",
-            x: 273,
-            y: 1,
+            x: 1,
+            y: 305,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_up_001",
-            x: 307,
-            y: 1,
+            x: 1,
+            y: 343,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_up_002",
-            x: 341,
-            y: 1,
+            x: 1,
+            y: 381,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_up_003",
-            x: 375,
-            y: 1,
+            x: 1,
+            y: 419,
             width: 32,
             height: 36,
+        ),
+        
+        (
+            name: "brick",
+            x: 1,
+            y: 457,
+            width: 32,
+            height: 32,
         ),
         
     ],

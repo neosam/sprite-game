@@ -69,36 +69,14 @@ fn initialize_test_sprite(world: &mut World) {
             world.create_entity(),
             &sprite_animations,
             transform,
-            physics::BoundingRect::new(-16.0, 16.0, -18.0, 0.0),
+            physics::BoundingRect::new(-16.0, 16.0, -18.0, 18.0),
             "healer")
         .build();
 
-    // Add a bush
-    let ground_texture_handle = {
-        let loader = world.read_resource::<Loader>();
-        let texture_storage = world.read_resource::<AssetStorage<Texture>>();
-        loader.load(
-            "texture/Ground0.png",
-            PngFormat,
-            TextureMetadata::srgb_scale(),
-            (),
-            &texture_storage,
-        )
-    };
-    let ground_sprite_sheet_handle = {
-        let loader = world.read_resource::<Loader>();
-        let sprite_sheet_store = world.read_resource::<AssetStorage<SpriteSheet>>();
-        loader.load(
-            "texture/Ground0.ron", // Here we load the associated ron file
-            SpriteSheetFormat,
-            ground_texture_handle, // We pass it the texture we want it to use
-            (),
-            &sprite_sheet_store,
-        )
-    };
+    // Add a brick
     let ground_sprite_render = SpriteRender {
-        sprite_sheet: ground_sprite_sheet_handle.clone(),
-        sprite_number: 0,
+        sprite_sheet: sprite_animations.sprite_sheet_handle.clone(),
+        sprite_number: *sprite_animations.images.get("brick").unwrap(),
     };
     let mut ground_transform = Transform::default();
     ground_transform.set_xyz(100.0, 100.0, -100.0);
