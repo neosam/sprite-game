@@ -25,8 +25,8 @@ mod helper;
 
 struct Example;
 
-pub const ARENA_WIDTH: f32 = 500.0;
-pub const ARENA_HEIGHT: f32 = 500.0;
+pub const ARENA_WIDTH: f32 = 640.0;
+pub const ARENA_HEIGHT: f32 = 480.0;
 
 
 
@@ -59,6 +59,7 @@ fn initialise_camera(world: &mut World) {
         .build();
 }
 
+
 fn initialize_test_sprite(world: &mut World) {
     let sprite_animations = spriteanimationloader::load_sprites(world, "texture", "tp-export.ron");
 
@@ -78,7 +79,56 @@ fn initialize_test_sprite(world: &mut World) {
             (-16.0, 16.0, -16.0, 16.0),
             "brick")
         .build();
+    generate_surrounding_walls(world, &sprite_animations);
 }
+
+fn generate_surrounding_walls(world: &mut World, animations: &spriteanimationloader::SpriteAnimationStore) {
+    let tiles_x = ARENA_WIDTH as i32 / 32;
+    let tiles_y = ARENA_HEIGHT as i32 / 32;
+    let size = (-16.0, 16.0, -16.0, 16.0);
+
+    for x in 0..tiles_x {
+        helper::create_solid(
+            world.create_entity(),
+            &animations,
+            (x as f32 * 32.0, 0.0),
+            size,
+            "brick"
+        ).build();
+        helper::create_solid(
+            world.create_entity(),
+            &animations,
+            (x as f32 * 32.0, tiles_y as f32 * 32.0),
+            size,
+            "brick"
+        ).build();
+    }
+
+    for y in 0..tiles_y {
+        helper::create_solid(
+            world.create_entity(),
+            &animations,
+            (0.0, y as f32 * 32.0),
+            size,
+            "brick"
+        ).build();
+        helper::create_solid(
+            world.create_entity(),
+            &animations,
+            (tiles_x as f32 * 32.0, y as f32 * 32.0),
+            size,
+            "brick"
+        ).build();
+    }
+    helper::create_solid(
+        world.create_entity(),
+        &animations,
+        (tiles_x as f32 * 32.0, tiles_y as f32 * 32.0),
+        size,
+        "brick"
+    ).build();
+}
+
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());

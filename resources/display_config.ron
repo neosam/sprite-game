@@ -1,6 +1,6 @@
 (
   title: "sprite-game",
-  dimensions: Some((500, 500)),
+  dimensions: Some((640, 480)),
   max_dimensions: None,
   min_dimensions: None,
   fullscreen: false,
