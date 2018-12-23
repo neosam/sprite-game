@@ -1,29 +1,53 @@
 (
     texture_path: "tp-export.png",
-    texture_width: 34,
-    texture_height: 490,
+    texture_width: 102,
+    texture_height: 186,
     sprites: [
+        
+        (
+            name: "brick",
+            x: 1,
+            y: 1,
+            width: 32,
+            height: 32,
+        ),
+        
+        (
+            name: "bush",
+            x: 35,
+            y: 1,
+            width: 32,
+            height: 32,
+        ),
+        
+        (
+            name: "stones",
+            x: 69,
+            y: 1,
+            width: 32,
+            height: 32,
+        ),
         
         (
             name: "healer_walk_down_001",
             x: 1,
-            y: 1,
+            y: 35,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_down_002",
-            x: 1,
-            y: 39,
+            x: 35,
+            y: 35,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_down_003",
-            x: 1,
-            y: 77,
+            x: 69,
+            y: 35,
             width: 32,
             height: 36,
         ),
@@ -31,23 +55,23 @@
         (
             name: "healer_walk_left_001",
             x: 1,
-            y: 115,
+            y: 73,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_left_002",
-            x: 1,
-            y: 153,
+            x: 35,
+            y: 73,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_left_003",
-            x: 1,
-            y: 191,
+            x: 69,
+            y: 73,
             width: 32,
             height: 36,
         ),
@@ -55,23 +79,23 @@
         (
             name: "healer_walk_right_001",
             x: 1,
-            y: 229,
+            y: 111,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_right_002",
-            x: 1,
-            y: 267,
+            x: 35,
+            y: 111,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_right_003",
-            x: 1,
-            y: 305,
+            x: 69,
+            y: 111,
             width: 32,
             height: 36,
         ),
@@ -79,33 +103,25 @@
         (
             name: "healer_walk_up_001",
             x: 1,
-            y: 343,
+            y: 149,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_up_002",
-            x: 1,
-            y: 381,
+            x: 35,
+            y: 149,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_up_003",
-            x: 1,
-            y: 419,
+            x: 69,
+            y: 149,
             width: 32,
             height: 36,
-        ),
-        
-        (
-            name: "brick",
-            x: 1,
-            y: 457,
-            width: 32,
-            height: 32,
         ),
         
     ],

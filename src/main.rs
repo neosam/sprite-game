@@ -78,6 +78,25 @@ fn initialize_test_sprite(world: &mut World) {
             "brick")
         .build();
     generate_surrounding_walls(world, &sprite_animations);
+
+    for y in 0..2 {
+        helper::create_solid(
+                world.create_entity(), 
+                &sprite_animations, 
+                (100.0, ARENA_HEIGHT - 100.0 - y as f32 * 32.0),
+                (-16.0, 16.0, -16.0, 16.0),
+                "stones")
+            .build();
+    }
+    
+    helper::create_solid(
+            world.create_entity(), 
+            &sprite_animations, 
+            (ARENA_WIDTH - 100.0, ARENA_HEIGHT - 100.0),
+            (-16.0, 16.0, -16.0, 16.0),
+            "bush")
+        .build();
+    generate_surrounding_walls(world, &sprite_animations);
 }
 
 fn generate_surrounding_walls(world: &mut World, animations: &spriteanimationloader::SpriteAnimationStore) {
