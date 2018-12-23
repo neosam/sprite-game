@@ -74,19 +74,15 @@ fn initialize_test_sprite(world: &mut World) {
         .build();
 
     // Add a brick
-    let ground_sprite_render = SpriteRender {
-        sprite_sheet: sprite_animations.sprite_sheet_handle.clone(),
-        sprite_number: *sprite_animations.images.get("brick").unwrap(),
-    };
     let mut ground_transform = Transform::default();
     ground_transform.set_xyz(100.0, 100.0, -100.0);
 
-    world.create_entity()
-        .with(ground_sprite_render)
-        .with(ground_transform)
-        .with(physics::BoundingRect::new(-8.0, 8.0, -8.0, 8.0))
-        .with(Transparent)
-        .with(physics::Solid)
+    character::create_solid(
+            world.create_entity(), 
+            &sprite_animations, 
+            ground_transform,
+            physics::BoundingRect::new(-8.0, 8.0, -8.0, 8.0),
+            "brick")
         .build();
 }
 

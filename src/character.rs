@@ -10,13 +10,13 @@ use crate::spriteanimationloader::SpriteAnimationStore;
 use crate::physics::{
     BoundingRect,
     Physics,
+    Solid,
 };
 use crate::spriteanimation::SpriteAnimation;
 use crate::charactermeta::CharacterMeta;
 use crate::charactermeta::CharacterDirection;
 use crate::characteranimation::CharacterAnimation;
 use crate::charactermove::CharacterMove;
-
 
 pub fn create_character<'a>(
         entity_builder: EntityBuilder<'a>,
@@ -62,3 +62,21 @@ pub fn create_character<'a>(
         .with(rect)
 }
 
+pub fn create_solid<'a>(
+        entity_builder: EntityBuilder<'a>,
+        animations: &SpriteAnimationStore,
+        transform: Transform,
+        rect: BoundingRect,
+        name: &str) -> EntityBuilder<'a> {
+    let sprite_render = SpriteRender {
+        sprite_sheet: animations.sprite_sheet_handle.clone(),
+        sprite_number: *animations.images.get(name).unwrap_or(&0),
+    };
+
+    entity_builder
+        .with(sprite_render)
+        .with(transform)
+        .with(rect)
+        .with(Transparent)
+        .with(Solid)
+}
