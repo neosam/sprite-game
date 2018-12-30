@@ -53,7 +53,9 @@ impl<'s> System<'s> for DestroySystem {
                 let sum_height = bouding_rect.height() + dest_bouding_rect.height();
                 if max_right - min_left < sum_width && max_top - min_bottom < sum_height {
                     println!("Removing");
-                    lazy_update.remove::<SpriteRender>(entity);
+                    lazy_update.exec_mut(move |world| {
+                        world.delete_entity(entity);
+                    });
                 }
             }
         } 
