@@ -22,6 +22,7 @@ pub mod spriteanimationloader;
 pub mod helper;
 pub mod damage;
 pub mod delayedremove;
+pub mod swordattack;
 
 struct Example;
 
@@ -70,7 +71,7 @@ fn initialize_test_sprite(world: &mut World) {
             (-16.0, 16.0, -16.0, 16.0),
             "healer")
         .with(charactermove::UserMove)
-        .with(damage::Destroyer { damage: 1.0})
+       // .with(damage::Destroyer { damage: 1.0})
         .build();
 
     // Add a brick
@@ -93,15 +94,19 @@ fn initialize_test_sprite(world: &mut World) {
             .build();
     }
     
-    helper::create_walkable(
-            world.create_entity(), 
-            &sprite_animations, 
-            (ARENA_WIDTH - 100.0, ARENA_HEIGHT - 100.0),
-            (-16.0, 16.0, -16.0, 16.0),
-            "bush")
-        .with(damage::Destroyable { health: 1000.0 })
-        .build();
-    generate_surrounding_walls(world, &sprite_animations);
+    for y in -3..3 {
+        for x in -3..3 {
+            helper::create_solid(
+                    world.create_entity(), 
+                    &sprite_animations, 
+                    (ARENA_WIDTH - 100.0 + x as f32 * 32.0, ARENA_HEIGHT - 100.0 + y as f32 * 32.0),
+                    (-16.0, 16.0, -16.0, 16.0),
+                    "bush")
+                .with(damage::Destroyable { health: 2.0 })
+                .build();
+            generate_surrounding_walls(world, &sprite_animations);
+        }
+    }
 }
 
 fn generate_surrounding_walls(world: &mut World, animations: &spriteanimationloader::SpriteAnimationStore) {
@@ -196,7 +201,8 @@ fn main() -> amethyst::Result<()> {
             .with(spriteanimation::SpriteAnimationSystem, "sprite_animation", &[])
             .with(charactermove::CharacterMoveSystem, "character_move", &[])
             .with(characteranimation::CharacterAnimationSystem, "character_animation", &["sprite_animation", "character_move"])
-            .with(damage::DestroySystem, "destroy", &["physics"]);
+            .with(damage::DestroySystem, "destroy", &["physics"])
+            .with(delayedremove::DelayedRemoveSystem, "delayed_remove", &[]);
     let mut game = Application::new("./", Example, game_data)?;
 
     game.run();

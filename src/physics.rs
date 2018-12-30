@@ -28,6 +28,7 @@ impl Physics {
 /// Component which defines the dimension of an entity
 /// 
 /// The dimension of the entity is used for collision detection.
+#[derive(Clone)]
 pub struct BoundingRect {
     pub left: f32,
     pub right: f32,

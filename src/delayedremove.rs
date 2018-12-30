@@ -1,7 +1,7 @@
 //! Performs a sword attack
 
 use amethyst::{
-    ecs::{Join, Read, ReadStorage, System, WriteStorage, Component, DenseVecStorage, LazyUpdate, Entities},
+    ecs::{Join, Read, System, WriteStorage, Component, DenseVecStorage, LazyUpdate, Entities},
     core::{
         timing::Time,
     },
@@ -13,6 +13,14 @@ pub struct DelayedRemove {
 }
 impl Component for DelayedRemove {
     type Storage = DenseVecStorage<Self>;
+}
+impl DelayedRemove {
+    pub fn new(end: f32) -> Self {
+        DelayedRemove {
+            current: 0.0,
+            end
+        }
+    }
 }
 
 pub struct DelayedRemoveSystem;

@@ -2,11 +2,13 @@
 
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
 use amethyst::input::InputHandler;
-use amethyst::ecs::{Component, DenseVecStorage};
+use amethyst::ecs::{Component, DenseVecStorage, LazyUpdate};
+use amethyst::core::Transform;
 
 
 use crate::charactermeta::{CharacterMeta, CharacterDirection};
-use crate::physics::Physics;
+use crate::physics::{Physics, BoundingRect};
+use crate::swordattack::sword_attack;
 
 /// Ability to let the character move.
 pub struct CharacterMove {
@@ -39,11 +41,14 @@ impl<'s> System<'s> for CharacterMoveSystem {
         WriteStorage<'s, CharacterMeta>,
         ReadStorage<'s, CharacterMove>,
         ReadStorage<'s, UserMove>,
+        ReadStorage<'s, Transform>,
+        ReadStorage<'s, BoundingRect>,
         Read<'s, InputHandler<String, String>>,
+        Read<'s, LazyUpdate>,
     );
 
-    fn run(&mut self, (mut physics, mut character_meta, character_moves, user_moves, input): Self::SystemData) {
-        for (physics, character_meta, character_move, _) in (&mut physics, &mut character_meta, &character_moves, &user_moves).join() {
+    fn run(&mut self, (mut physics, mut character_meta, character_moves, user_moves, transforms, bounding_rects, input, lazy_update): Self::SystemData) {
+        for (physics, character_meta, character_move, _, transform, bounding_rect) in (&mut physics, &mut character_meta, &character_moves, &user_moves, &transforms, &bounding_rects).join() {
             physics.velocity.x =
                 input.axis_value("player_move_x").unwrap() as f32
                  * character_move.speed;
@@ -65,6 +70,14 @@ impl<'s> System<'s> for CharacterMoveSystem {
                 character_meta.moving = true;
             } else {
                 character_meta.moving = false;
+            }
+            if input.action_is_down("attack").unwrap() {
+                let transform: Transform = transform.clone();
+                let bounding_rect: BoundingRect = bounding_rect.clone();
+                let direction: CharacterDirection = character_meta.direction.clone();
+                lazy_update.exec_mut(move |world| {
+                    sword_attack(world, 1.0, transform, bounding_rect, direction);
+                });
             }
         }
     }

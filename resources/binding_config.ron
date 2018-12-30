@@ -3,5 +3,7 @@
     "player_move_x": Emulated(pos: Key(D), neg: Key(A)),
     "player_move_y": Emulated(pos: Key(W), neg: Key(S)),
   },
-  actions: {},
+  actions: {
+    "attack": [[Key(Space)]],
+  },
 )
