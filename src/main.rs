@@ -21,6 +21,7 @@ pub mod physics;
 pub mod spriteanimationloader;
 pub mod helper;
 pub mod damage;
+pub mod delayedremove;
 
 struct Example;
 
