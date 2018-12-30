@@ -20,6 +20,7 @@ pub mod characteranimation;
 pub mod physics;
 pub mod spriteanimationloader;
 pub mod helper;
+pub mod damage;
 
 struct Example;
 
@@ -68,6 +69,7 @@ fn initialize_test_sprite(world: &mut World) {
             (-16.0, 16.0, -16.0, 16.0),
             "healer")
         .with(charactermove::UserMove)
+        .with(damage::Destroyer)
         .build();
 
     // Add a brick
@@ -90,12 +92,13 @@ fn initialize_test_sprite(world: &mut World) {
             .build();
     }
     
-    helper::create_solid(
+    helper::create_walkable(
             world.create_entity(), 
             &sprite_animations, 
             (ARENA_WIDTH - 100.0, ARENA_HEIGHT - 100.0),
             (-16.0, 16.0, -16.0, 16.0),
             "bush")
+        .with(damage::Destroyable)
         .build();
     generate_surrounding_walls(world, &sprite_animations);
 }
@@ -136,7 +139,8 @@ fn generate_surrounding_walls(world: &mut World, animations: &spriteanimationloa
             (tiles_x as f32 * 32.0, y as f32 * 32.0),
             size,
             "brick"
-        ).build();
+        )
+        .build();
     }
     helper::create_solid(
         world.create_entity(),
@@ -190,7 +194,8 @@ fn main() -> amethyst::Result<()> {
             .with(physics::PhysicsSystem, "physics", &[])
             .with(spriteanimation::SpriteAnimationSystem, "sprite_animation", &[])
             .with(charactermove::CharacterMoveSystem, "character_move", &[])
-            .with(characteranimation::CharacterAnimationSystem, "character_animation", &["sprite_animation", "character_move"]);
+            .with(characteranimation::CharacterAnimationSystem, "character_animation", &["sprite_animation", "character_move"])
+            .with(damage::DestroySystem, "destroy", &["physics"]);
     let mut game = Application::new("./", Example, game_data)?;
 
     game.run();

@@ -181,18 +181,33 @@
         </struct>
         <key>individualSpriteSettings</key>
         <map type="IndividualSpriteSettingsMap">
-            <key type="filename">healer-walk-down_001.png</key>
-            <key type="filename">healer-walk-down_002.png</key>
-            <key type="filename">healer-walk-down_003.png</key>
-            <key type="filename">healer-walk-left_001.png</key>
-            <key type="filename">healer-walk-left_002.png</key>
-            <key type="filename">healer-walk-left_003.png</key>
-            <key type="filename">healer-walk-right_001.png</key>
-            <key type="filename">healer-walk-right_002.png</key>
-            <key type="filename">healer-walk-right_003.png</key>
-            <key type="filename">healer-walk-up_001.png</key>
-            <key type="filename">healer-walk-up_002.png</key>
-            <key type="filename">healer-walk-up_003.png</key>
+            <key type="filename">brick.png</key>
+            <key type="filename">bush.png</key>
+            <key type="filename">stones.png</key>
+            <struct type="IndividualSpriteSettings">
+                <key>pivotPoint</key>
+                <point_f>0.5,0.5</point_f>
+                <key>scale9Enabled</key>
+                <false/>
+                <key>scale9Borders</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9Paddings</key>
+                <rect>8,8,16,16</rect>
+                <key>scale9FromFile</key>
+                <false/>
+            </struct>
+            <key type="filename">healer_walk_down_001.png</key>
+            <key type="filename">healer_walk_down_002.png</key>
+            <key type="filename">healer_walk_down_003.png</key>
+            <key type="filename">healer_walk_left_001.png</key>
+            <key type="filename">healer_walk_left_002.png</key>
+            <key type="filename">healer_walk_left_003.png</key>
+            <key type="filename">healer_walk_right_001.png</key>
+            <key type="filename">healer_walk_right_002.png</key>
+            <key type="filename">healer_walk_right_003.png</key>
+            <key type="filename">healer_walk_up_001.png</key>
+            <key type="filename">healer_walk_up_002.png</key>
+            <key type="filename">healer_walk_up_003.png</key>
             <struct type="IndividualSpriteSettings">
                 <key>pivotPoint</key>
                 <point_f>0.5,0.5</point_f>

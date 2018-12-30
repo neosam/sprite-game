@@ -45,6 +45,18 @@ impl BoundingRect {
     }
 }
 
+impl BoundingRect {
+    /// Get the width of the rect.
+    pub fn width(&self) -> f32 {
+        self.right - self.left
+    }
+
+    /// Get the height of the rect.
+    pub fn height(&self) -> f32 {
+        self.top - self.bottom
+    }
+}
+
 /// Component which defines that an entity is not movable
 /// 
 /// Items which have the Physics Component will collide with

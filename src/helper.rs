@@ -129,3 +129,44 @@ pub fn create_solid<'a>(
         .with(Transparent)
         .with(Solid)
 }
+
+
+
+/// Assebles a walkable entity
+/// 
+/// Assigns the components to the EntityBuilder which are required
+/// to have a solid enity.
+/// 
+/// The name must match the sprite name in.
+/// 
+/// ## Examples
+/// ```
+/// use helper::create_solid;
+/// 
+/// create_solid(
+///         world.create_entity(),
+///         &animations,
+///         (300.0, 300.0),
+///         (-16.0, 16.0, -16.0, 16.0),
+///         "hero"
+/// ).build();
+/// ```
+pub fn create_walkable<'a>(
+        entity_builder: EntityBuilder<'a>,
+        animations: &SpriteAnimationStore,
+        (x, y): (f32, f32),
+        (left, right, bottom, top): (f32, f32, f32, f32),
+        name: &str) -> EntityBuilder<'a> {
+    let sprite_render = SpriteRender {
+        sprite_sheet: animations.sprite_sheet_handle.clone(),
+        sprite_number: *animations.images.get(name).unwrap_or(&0),
+    };
+    let mut transform = Transform::default();
+    transform.set_xyz(x, y, -y);
+
+    entity_builder
+        .with(sprite_render)
+        .with(transform)
+        .with(BoundingRect::new(left, right, bottom, top))
+        .with(Transparent)
+}
