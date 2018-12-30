@@ -69,7 +69,7 @@ fn initialize_test_sprite(world: &mut World) {
             (-16.0, 16.0, -16.0, 16.0),
             "healer")
         .with(charactermove::UserMove)
-        .with(damage::Destroyer)
+        .with(damage::Destroyer { damage: 1.0})
         .build();
 
     // Add a brick
@@ -98,7 +98,7 @@ fn initialize_test_sprite(world: &mut World) {
             (ARENA_WIDTH - 100.0, ARENA_HEIGHT - 100.0),
             (-16.0, 16.0, -16.0, 16.0),
             "bush")
-        .with(damage::Destroyable)
+        .with(damage::Destroyable { health: 1000.0 })
         .build();
     generate_surrounding_walls(world, &sprite_animations);
 }

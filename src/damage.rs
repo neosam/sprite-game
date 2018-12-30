@@ -3,21 +3,23 @@
 use amethyst::{
     ecs::{Join, Read, ReadStorage, System, WriteStorage, Component, DenseVecStorage, LazyUpdate, Entities},
     core::Transform,
-    renderer::SpriteRender,
-
 };
 
 use crate::physics::BoundingRect;
 
 
 /// Destroys entities which are destroyable.
-pub struct Destroyer;
+pub struct Destroyer {
+    pub damage: f32
+}
 impl Component for Destroyer {
     type Storage = DenseVecStorage<Self>;
 }
 
 /// Will be destroyed if collides with a Destroyer.
-pub struct Destroyable;
+pub struct Destroyable {
+    pub health: f32
+}
 impl Component for Destroyable {
     type Storage = DenseVecStorage<Self>;
 }
@@ -27,16 +29,16 @@ pub struct DestroySystem;
 impl<'s> System<'s> for DestroySystem {
     type SystemData = (
         ReadStorage<'s, Destroyer>,
-        ReadStorage<'s, Destroyable>,
+        WriteStorage<'s, Destroyable>,
         ReadStorage<'s, Transform>,
         ReadStorage<'s, BoundingRect>,
         Read<'s, LazyUpdate>,
         Entities<'s>,
     );
 
-    fn run(&mut self, (destroyers, destroyables, transforms, bouding_rects, lazy_update, entities): Self::SystemData) {
-        for (_, transform, bouding_rect) in (&destroyers, &transforms, &bouding_rects).join() {
-            for (_, dest_transform, dest_bouding_rect, entity) in (&destroyables, &transforms, &bouding_rects, &entities).join() {
+    fn run(&mut self, (destroyers, mut destroyables, transforms, bouding_rects, lazy_update, entities): Self::SystemData) {
+        for (destroyer, transform, bouding_rect) in (&destroyers, &transforms, &bouding_rects).join() {
+            for (mut destroyable, dest_transform, dest_bouding_rect, entity) in (&mut destroyables, &transforms, &bouding_rects, &entities).join() {
                 let min_left = (transform.translation().x + bouding_rect.left).min(
                     dest_transform.translation().x + dest_bouding_rect.left
                 );
@@ -52,10 +54,15 @@ impl<'s> System<'s> for DestroySystem {
                 let sum_width = bouding_rect.width() + dest_bouding_rect.width();
                 let sum_height = bouding_rect.height() + dest_bouding_rect.height();
                 if max_right - min_left < sum_width && max_top - min_bottom < sum_height {
-                    println!("Removing");
-                    lazy_update.exec_mut(move |world| {
-                        world.delete_entity(entity);
-                    });
+                    destroyable.health -= destroyer.damage;
+                    if destroyable.health < 0.0 {
+                        println!("Removing");
+                        lazy_update.exec_mut(move |world| {
+                            if let Err(err) = world.delete_entity(entity) {
+                                println!("Couldn't remove entity.  Error: {}", err);
+                            }
+                        });
+                    }
                 }
             }
         } 
