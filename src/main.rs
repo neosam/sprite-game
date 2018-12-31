@@ -91,11 +91,12 @@ fn initialize_test_sprite(world: &mut World) {
                 (100.0, ARENA_HEIGHT - 100.0 - y as f32 * 32.0),
                 (-16.0, 16.0, -16.0, 16.0),
                 "stones")
+            .with(damage::Destroyable { health: 1000.0 })
             .build();
     }
     
-    for y in -3..3 {
-        for x in -3..3 {
+    for y in -5..3 {
+        for x in -5..3 {
             helper::create_solid(
                     world.create_entity(), 
                     &sprite_animations, 

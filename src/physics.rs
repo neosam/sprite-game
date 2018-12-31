@@ -3,8 +3,9 @@
 use amethyst::ecs::{Component, DenseVecStorage};
 use na::{Vector2};
 use amethyst::core::Transform;
-use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
+use amethyst::ecs::{Join, ParJoin, Read, ReadStorage, System, WriteStorage};
 use amethyst::core::timing::Time;
+use amethyst::ecs::prelude::ParallelIterator;
 
 /// Component which controls the physics of an entity.
 /// 
@@ -80,22 +81,25 @@ impl<'s> System<'s> for PhysicsSystem {
     );
 
     fn run(&mut self, (mut physics, bounding_rects, solids, mut transforms, time): Self::SystemData) {
-        for (physics, transform, bounding_rect) in (&mut physics, &transforms, &bounding_rects).join() {
-            for (o_transform, o_bounding_rect, _) in (&transforms, &bounding_rects, &solids).join() {
-                let x = transform.translation().x + physics.velocity.x * time.delta_seconds();
-                let y = transform.translation().y + physics.velocity.y * time.delta_seconds();
-                let min_left_x = (x + bounding_rect.left).min(o_transform.translation().x + o_bounding_rect.left);
-                let min_bottom_y = (y + bounding_rect.bottom).min(o_transform.translation().y + o_bounding_rect.bottom);
-                let max_right_x = (x + bounding_rect.right).max(o_transform.translation().x + o_bounding_rect.right);
-                let max_top_y = (y + bounding_rect.top).max(o_transform.translation().y + o_bounding_rect.top);
-                let sum_width = (bounding_rect.right - bounding_rect.left) + (o_bounding_rect.right - o_bounding_rect.left);
-                let sum_height = (bounding_rect.top - bounding_rect.bottom) + (o_bounding_rect.top - o_bounding_rect.bottom);
-                if (max_right_x - min_left_x) < sum_width && (max_top_y - min_bottom_y) < sum_height {
-                    physics.velocity.x = 0.0;
-                    physics.velocity.y = 0.0;
+        (&mut physics, &transforms, &bounding_rects).par_join().for_each(
+                    |(physics, transform, bounding_rect)| {
+                for (o_transform, o_bounding_rect, _) in (&transforms, &bounding_rects, &solids).join() {
+                    let x = transform.translation().x + physics.velocity.x * time.delta_seconds();
+                    let y = transform.translation().y + physics.velocity.y * time.delta_seconds();
+                    let min_left_x = (x + bounding_rect.left).min(o_transform.translation().x + o_bounding_rect.left);
+                    let min_bottom_y = (y + bounding_rect.bottom).min(o_transform.translation().y + o_bounding_rect.bottom);
+                    let max_right_x = (x + bounding_rect.right).max(o_transform.translation().x + o_bounding_rect.right);
+                    let max_top_y = (y + bounding_rect.top).max(o_transform.translation().y + o_bounding_rect.top);
+                    let sum_width = (bounding_rect.right - bounding_rect.left) + (o_bounding_rect.right - o_bounding_rect.left);
+                    let sum_height = (bounding_rect.top - bounding_rect.bottom) + (o_bounding_rect.top - o_bounding_rect.bottom);
+                    if (max_right_x - min_left_x) < sum_width && (max_top_y - min_bottom_y) < sum_height {
+                        physics.velocity.x = 0.0;
+                        physics.velocity.y = 0.0;
+                    }
                 }
             }
-        }
+        );
+            
         for (physics, transform) in (&physics, &mut transforms).join() {
             transform.translate_x(
                 physics.velocity.x
