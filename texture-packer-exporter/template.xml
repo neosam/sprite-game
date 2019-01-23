@@ -1,0 +1,18 @@
+(
+    texture_path: "{{texture.fullName}}",
+    texture_width: {{texture.size.width}},
+    texture_height: {{texture.size.height}},
+    sprites: [
+        {% for sprite in sprites %}
+        (
+            name: "{{sprite.trimmedName}}",
+            x: {{sprite.frameRect.x}},
+            y: {{sprite.frameRect.y}},
+            width: {{sprite.frameRect.width}},
+            height: {{sprite.frameRect.height}},
+        ),
+        {% endfor %}
+    ],
+    animations: {},
+    images: {},
+)
