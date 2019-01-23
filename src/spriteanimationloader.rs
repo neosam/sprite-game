@@ -1,14 +1,14 @@
 //! Load animations and sprites from a ron file.
 
 use amethyst::{
-    prelude::*,
-    assets::{Loader, AssetStorage},
-    renderer::{Sprite, SpriteSheet, SpriteSheetHandle, PngFormat, Texture, TextureMetadata},
+    assets::{AssetStorage, Loader},
     config::Config,
+    prelude::*,
+    renderer::{PngFormat, Sprite, SpriteSheet, SpriteSheetHandle, Texture, TextureMetadata},
 };
-use std::collections::BTreeMap;
-use serde::{Serialize, Deserialize};
 use regex::Regex;
+use serde::{Deserialize, Serialize};
+use std::collections::BTreeMap;
 
 /// Definintion of one sprite in the RON file.
 #[derive(Debug, Serialize, Deserialize)]
@@ -18,7 +18,7 @@ pub struct SpriteDefinition {
     pub y: u32,
     pub width: u32,
     pub height: u32,
-    pub offset: Option<(f32, f32)>
+    pub offset: Option<(f32, f32)>,
 }
 
 /// RON file definition.
@@ -50,24 +50,26 @@ impl Default for AnimationData {
 pub struct SpriteAnimationStore {
     pub sprite_sheet_handle: SpriteSheetHandle,
     pub animations: BTreeMap<String, Vec<usize>>,
-    pub images: BTreeMap<String, usize>
+    pub images: BTreeMap<String, usize>,
 }
 
 /// Use an AnimationData and create animations and sprite images based on sprite names.
-/// 
+///
 /// If a name ends with underscores followed by numbers it is treated as part of an animations.
 /// In this case it will add it to the animations, otherwise it will simply store the index in
 /// the images tree map under that name.
 pub fn manually_assign_animations(animation_data: &mut AnimationData) {
-    let mut animations : BTreeMap<String, Vec<usize>> = BTreeMap::new();
-    let mut images : BTreeMap<String, usize> = BTreeMap::new();
+    let mut animations: BTreeMap<String, Vec<usize>> = BTreeMap::new();
+    let mut images: BTreeMap<String, usize> = BTreeMap::new();
 
     let ends_with_number_pattern = Regex::new(r"_\d+$").unwrap();
     for (i, sprite) in (0..).zip(&animation_data.sprites) {
         if let Some(_) = ends_with_number_pattern.find(&sprite.name) {
             let animation_name = ends_with_number_pattern.replace_all(&sprite.name, "");
             println!("Animation name: {}", animation_name);
-            let entry = animations.entry(animation_name.to_string()).or_insert_with(|| Vec::new());
+            let entry = animations
+                .entry(animation_name.to_string())
+                .or_insert_with(|| Vec::new());
             entry.push(i);
         } else {
             images.insert(sprite.name.to_string(), i);
@@ -79,12 +81,15 @@ pub fn manually_assign_animations(animation_data: &mut AnimationData) {
 }
 
 /// Load animations and images from the given ron file.
-/// 
+///
 /// It requires a mutable reference to the world, a directory, where the assets are stored and the filename
 /// of the ron file inside the directory.  The reference to the image file in the ron file is relative to the
 /// directory provides as second argument.
-pub fn load_sprites<S: ToString, 
-                    T: ToString>(world: &mut World, directory: S, filename: T) -> SpriteAnimationStore {
+pub fn load_sprites<S: ToString, T: ToString>(
+    world: &mut World,
+    directory: S,
+    filename: T,
+) -> SpriteAnimationStore {
     // ---- Loading animations
     let directory = directory.to_string();
     let filename = filename.to_string();
@@ -113,11 +118,16 @@ pub fn load_sprites<S: ToString,
         sprites.push(Sprite::from_pixel_values(
             animations.texture_width,
             animations.texture_height,
-            sprite.width, sprite.height, sprite.x, sprite.y, offset));
+            sprite.width,
+            sprite.height,
+            sprite.x,
+            sprite.y,
+            offset,
+        ));
     }
     let sprite_sheet = SpriteSheet {
         texture: texture_handle,
-        sprites
+        sprites,
     };
 
     let sprite_sheet_handle = {

@@ -1,18 +1,17 @@
 //! ECS to handle character movement and input from the user
 
+use amethyst::core::Transform;
+use amethyst::ecs::{Component, DenseVecStorage, LazyUpdate};
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
 use amethyst::input::InputHandler;
-use amethyst::ecs::{Component, DenseVecStorage, LazyUpdate};
-use amethyst::core::Transform;
 
-
-use crate::charactermeta::{CharacterMeta, CharacterDirection};
-use crate::physics::{Physics, BoundingRect};
+use crate::charactermeta::{CharacterDirection, CharacterMeta};
+use crate::physics::{BoundingRect, Physics};
 use crate::swordattack::sword_attack;
 
 /// Ability to let the character move.
 pub struct CharacterMove {
-    pub speed: f32
+    pub speed: f32,
 }
 
 impl CharacterMove {
@@ -47,15 +46,34 @@ impl<'s> System<'s> for CharacterMoveSystem {
         Read<'s, LazyUpdate>,
     );
 
-    fn run(&mut self, (mut physics, mut character_meta, character_moves, user_moves, transforms, bounding_rects, input, lazy_update): Self::SystemData) {
-        for (physics, character_meta, character_move, _, transform, bounding_rect) in (&mut physics, &mut character_meta, &character_moves, &user_moves, &transforms, &bounding_rects).join() {
+    fn run(
+        &mut self,
+        (
+            mut physics,
+            mut character_meta,
+            character_moves,
+            user_moves,
+            transforms,
+            bounding_rects,
+            input,
+            lazy_update,
+        ): Self::SystemData,
+    ) {
+        for (physics, character_meta, character_move, _, transform, bounding_rect) in (
+            &mut physics,
+            &mut character_meta,
+            &character_moves,
+            &user_moves,
+            &transforms,
+            &bounding_rects,
+        )
+            .join()
+        {
             physics.velocity.x =
-                input.axis_value("player_move_x").unwrap() as f32
-                 * character_move.speed;
+                input.axis_value("player_move_x").unwrap() as f32 * character_move.speed;
             physics.velocity.y =
-                input.axis_value("player_move_y").unwrap() as f32
-                 * character_move.speed;
-                
+                input.axis_value("player_move_y").unwrap() as f32 * character_move.speed;
+
             if input.axis_value("player_move_x").unwrap() > 0.0 {
                 character_meta.direction = CharacterDirection::Right;
                 character_meta.moving = true;

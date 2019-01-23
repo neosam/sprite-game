@@ -1,15 +1,15 @@
 //! ECS to set required animations
-//! 
-//!  
+//!
+//!
 
-use amethyst::ecs::{Join, ReadStorage, System, WriteStorage};
 use amethyst::ecs::{Component, DenseVecStorage};
+use amethyst::ecs::{Join, ReadStorage, System, WriteStorage};
 
-use crate::charactermeta::CharacterMeta;
 use crate::charactermeta::CharacterDirection;
+use crate::charactermeta::CharacterMeta;
 use crate::spriteanimation::SpriteAnimation;
 
-/// Component which contains the sprite animations. 
+/// Component which contains the sprite animations.
 pub struct CharacterAnimation {
     pub prev_character_meta: crate::charactermeta::CharacterMeta,
     pub walk_up_animation: Vec<usize>,
@@ -22,7 +22,7 @@ impl Component for CharacterAnimation {
     type Storage = DenseVecStorage<Self>;
 }
 
-/// System to set the animations based on the CharacterMeta 
+/// System to set the animations based on the CharacterMeta
 pub struct CharacterAnimationSystem;
 impl<'s> System<'s> for CharacterAnimationSystem {
     type SystemData = (
@@ -31,9 +31,17 @@ impl<'s> System<'s> for CharacterAnimationSystem {
         WriteStorage<'s, SpriteAnimation>,
     );
 
-    fn run(&mut self, (mut character_animations, character_metas, mut sprite_animations): Self::SystemData) {
-        for (mut character_animation, character_meta, mut sprite_animation) 
-                in (&mut character_animations, &character_metas, &mut sprite_animations).join() {
+    fn run(
+        &mut self,
+        (mut character_animations, character_metas, mut sprite_animations): Self::SystemData,
+    ) {
+        for (mut character_animation, character_meta, mut sprite_animation) in (
+            &mut character_animations,
+            &character_metas,
+            &mut sprite_animations,
+        )
+            .join()
+        {
             if character_animation.prev_character_meta != *character_meta {
                 character_animation.prev_character_meta = character_meta.clone();
                 let new_animation = match character_meta.direction {
