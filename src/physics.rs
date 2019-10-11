@@ -3,7 +3,7 @@
 use amethyst::core::timing::Time;
 use amethyst::core::Transform;
 use amethyst::ecs::prelude::ParallelIterator;
-use amethyst::ecs::{Component, DenseVecStorage};
+use amethyst::ecs::{Component, VecStorage};
 use amethyst::ecs::{Join, ParJoin, Read, ReadStorage, System, WriteStorage};
 use na::Vector2;
 
@@ -15,7 +15,7 @@ pub struct Physics {
 }
 
 impl Component for Physics {
-    type Storage = DenseVecStorage<Self>;
+    type Storage = VecStorage<Self>;
 }
 
 impl Physics {
@@ -37,7 +37,7 @@ pub struct BoundingRect {
     pub bottom: f32,
 }
 impl Component for BoundingRect {
-    type Storage = DenseVecStorage<Self>;
+    type Storage = VecStorage<Self>;
 }
 impl BoundingRect {
     pub fn new(left: f32, right: f32, bottom: f32, top: f32) -> Self {
@@ -68,7 +68,7 @@ impl BoundingRect {
 /// Solid Components.
 pub struct Solid;
 impl Component for Solid {
-    type Storage = DenseVecStorage<Self>;
+    type Storage = VecStorage<Self>;
 }
 
 /// Handles movement of Entities and respects collisions.

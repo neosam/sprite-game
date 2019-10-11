@@ -35,7 +35,7 @@ impl SimpleState for Example {
         let world = data.world;
 
         //world.register::<SpriteRender>();
-        world.register::<Transparent>();
+        //world.register::<Transparent>();
 
         initialise_camera(world);
         initialize_test_sprite(world);
@@ -45,7 +45,7 @@ impl SimpleState for Example {
 /// Initialise the camera.
 fn initialise_camera(world: &mut World) {
     let mut transform = Transform::default();
-    transform.set_translation_xyz(0.0, 0.0, 1000.0);
+    transform.set_translation_xyz(ARENA_WIDTH as f32 / 2.0, ARENA_HEIGHT as f32 / 2.0, 1000.0);
 
     world
         .create_entity()
@@ -105,7 +105,6 @@ fn initialize_test_sprite(world: &mut World) {
             )
             .with(damage::Destroyable { health: 2.0 })
             .build();
-            generate_surrounding_walls(world, &sprite_animations);
         }
     }
 }

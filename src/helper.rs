@@ -97,7 +97,7 @@ pub fn create_character<'a>(
         .with(sprite_render)
         .with(transform)
         .with(sprite_animation)
-        .with(Transparent)
+        //.with(Transparent)
         .with(CharacterMove::new(128.0))
         .with(character_meta)
         .with(character_animation)
@@ -142,7 +142,7 @@ pub fn create_solid<'a>(
         .with(sprite_render)
         .with(transform)
         .with(BoundingRect::new(left, right, bottom, top))
-        .with(Transparent)
+     //   .with(Transparent)
         .with(Solid)
 }
 
@@ -183,5 +183,5 @@ pub fn create_walkable<'a>(
         .with(sprite_render)
         .with(transform)
         .with(BoundingRect::new(left, right, bottom, top))
-        .with(Transparent)
+    //    .with(Transparent)
 }
