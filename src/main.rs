@@ -24,6 +24,7 @@ pub mod physics;
 pub mod spriteanimation;
 pub mod spriteanimationloader;
 pub mod swordattack;
+pub mod room;
 
 struct Example;
 
@@ -57,111 +58,67 @@ fn initialise_camera(world: &mut World) {
 fn initialize_test_sprite(world: &mut World) {
     let sprite_animations = spriteanimationloader::load_sprites(world, "texture", "tp-export.ron");
 
-    helper::create_character(
-        world.create_entity(),
-        &sprite_animations,
-        (ARENA_WIDTH / 2.0, ARENA_HEIGHT / 2.0),
-        (-16.0, 16.0, -16.0, 16.0),
-        "healer",
-    )
-    .with(charactermove::UserMove)
-    // .with(damage::Destroyer { damage: 1.0})
-    .build();
+    // Generate a room
+    let tiles_x = ARENA_WIDTH as usize / 32;
+    let tiles_y = ARENA_HEIGHT as usize / 32;
+    let mut room_generation = room::RoomGeneration::default();
+    room_generation.width = tiles_x;
+    room_generation.height = tiles_y;
+    let room = room_generation.generate_room(&mut rand::thread_rng());
 
-    // Add a brick
-    helper::create_solid(
-        world.create_entity(),
-        &sprite_animations,
-        (100.0, 100.0),
-        (-16.0, 16.0, -16.0, 16.0),
-        "brick",
-    )
-    .build();
-    generate_surrounding_walls(world, &sprite_animations);
-
-    for y in 0..2 {
-        helper::create_solid(
-            world.create_entity(),
-            &sprite_animations,
-            (100.0, ARENA_HEIGHT - 100.0 - y as f32 * 32.0),
-            (-16.0, 16.0, -16.0, 16.0),
-            "stones",
-        )
-        .with(damage::Destroyable { health: 1000.0 })
-        .build();
-    }
-
-    for y in -5..3 {
-        for x in -5..3 {
-            helper::create_solid(
-                world.create_entity(),
-                &sprite_animations,
-                (
-                    ARENA_WIDTH - 100.0 + x as f32 * 32.0,
-                    ARENA_HEIGHT - 100.0 + y as f32 * 32.0,
-                ),
-                (-16.0, 16.0, -16.0, 16.0),
-                "bush",
-            )
-            .with(damage::Destroyable { health: 2.0 })
-            .build();
+    for (x, y, field) in room.room_field_iterator() {
+        let pixel_pos = (
+            x as f32 * 32.0 + 16.0,
+            y as f32 * 32.0 + 16.0,
+        );
+        let hitbox = (-14.0, 14.0, -14.0, 14.0);
+        match field {
+            room::RoomField::Nothing => {},
+            room::RoomField::Wall => {
+                // Add a brick
+                helper::create_solid(
+                    world.create_entity(),
+                    &sprite_animations,
+                    pixel_pos,
+                    hitbox,
+                    "brick",
+                ).build();
+            },
+            room::RoomField::Stone => {
+                // Add a stone
+                helper::create_solid(
+                    world.create_entity(),
+                    &sprite_animations,
+                    pixel_pos,
+                    hitbox,
+                    "stones",
+                ).build();
+            },
+            room::RoomField::Bush => {
+                // Add a bush
+                helper::create_solid(
+                    world.create_entity(),
+                    &sprite_animations,
+                    pixel_pos,
+                    hitbox,
+                    "bush",
+                ).with(damage::Destroyable { health: 2.0 })
+                .build();
+            },
+            room::RoomField::Player => {
+                helper::create_character(
+                    world.create_entity(),
+                    &sprite_animations,
+                    pixel_pos,
+                    hitbox,
+                    "healer",
+                )
+                .with(charactermove::UserMove)
+                // .with(damage::Destroyer { damage: 1.0})
+                .build();
+            }
         }
     }
-}
-
-fn generate_surrounding_walls(
-    world: &mut World,
-    animations: &spriteanimationloader::SpriteAnimationStore,
-) {
-    let tiles_x = ARENA_WIDTH as i32 / 32;
-    let tiles_y = ARENA_HEIGHT as i32 / 32;
-    let size = (-16.0, 16.0, -16.0, 16.0);
-
-    for x in 0..tiles_x {
-        helper::create_solid(
-            world.create_entity(),
-            &animations,
-            (x as f32 * 32.0, 0.0),
-            size,
-            "brick",
-        )
-        .build();
-        helper::create_solid(
-            world.create_entity(),
-            &animations,
-            (x as f32 * 32.0, tiles_y as f32 * 32.0),
-            size,
-            "brick",
-        )
-        .build();
-    }
-
-    for y in 0..tiles_y {
-        helper::create_solid(
-            world.create_entity(),
-            &animations,
-            (0.0, y as f32 * 32.0),
-            size,
-            "brick",
-        )
-        .build();
-        helper::create_solid(
-            world.create_entity(),
-            &animations,
-            (tiles_x as f32 * 32.0, y as f32 * 32.0),
-            size,
-            "brick",
-        )
-        .build();
-    }
-    helper::create_solid(
-        world.create_entity(),
-        &animations,
-        (tiles_x as f32 * 32.0, tiles_y as f32 * 32.0),
-        size,
-        "brick",
-    )
-    .build();
 }
 
 fn main() -> amethyst::Result<()> {

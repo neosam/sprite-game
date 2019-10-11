@@ -87,10 +87,10 @@ pub fn manually_assign_animations(animation_data: &mut AnimationData) {
 /// It requires a mutable reference to the world, a directory, where the assets are stored and the filename
 /// of the ron file inside the directory.  The reference to the image file in the ron file is relative to the
 /// directory provides as second argument.
-pub fn load_sprites<S: ToString, T: ToString>(
+pub fn load_sprites(
     world: &mut World,
-    directory: S,
-    filename: T,
+    directory: impl ToString,
+    filename: impl ToString,
 ) -> SpriteAnimationStore {
     // ---- Loading animations
     let directory = directory.to_string();
