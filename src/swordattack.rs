@@ -19,7 +19,7 @@ pub fn sword_attack(
         CharacterDirection::Right => (translation.x + bounding_rect.right, translation.y),
     };
     let mut damage_transform = Transform::default();
-    damage_transform.set_xyz(x, y, -y);
+    damage_transform.set_translation_xyz(x, y, -y);
     world
         .create_entity()
         .with(damage_transform)

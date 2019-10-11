@@ -4,7 +4,9 @@ use amethyst::{
     assets::{AssetStorage, Loader},
     config::Config,
     prelude::*,
-    renderer::{PngFormat, Sprite, SpriteSheet, SpriteSheetHandle, Texture, TextureMetadata},
+    renderer::{ImageFormat, Sprite, SpriteSheet, /*SpriteSheetHandle,*/ Texture, /*TextureMetadata*/
+        sprite::SpriteSheetHandle,
+    },
 };
 use regex::Regex;
 use serde::{Deserialize, Serialize};
@@ -102,8 +104,7 @@ pub fn load_sprites<S: ToString, T: ToString>(
         let texture_storage = world.read_resource::<AssetStorage<Texture>>();
         loader.load(
             texture_path,
-            PngFormat,
-            TextureMetadata::srgb_scale(),
+            ImageFormat::default(),
             (),
             &texture_storage,
         )
@@ -123,6 +124,8 @@ pub fn load_sprites<S: ToString, T: ToString>(
             sprite.x,
             sprite.y,
             offset,
+            false,
+            false
         ));
     }
     let sprite_sheet = SpriteSheet {

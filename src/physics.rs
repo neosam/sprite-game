@@ -117,9 +117,9 @@ impl<'s> System<'s> for PhysicsSystem {
             });
 
         for (physics, transform) in (&physics, &mut transforms).join() {
-            transform.translate_x(physics.velocity.x * time.delta_seconds());
-            transform.translate_y(physics.velocity.y * time.delta_seconds());
-            transform.set_z(-transform.translation().y);
+            transform.move_right(physics.velocity.x * time.delta_seconds());
+            transform.move_up(physics.velocity.y * time.delta_seconds());
+            transform.set_translation_z(-transform.translation().y);
         }
     }
 }

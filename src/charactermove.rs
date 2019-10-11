@@ -3,7 +3,7 @@
 use amethyst::core::Transform;
 use amethyst::ecs::{Component, DenseVecStorage, LazyUpdate};
 use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
-use amethyst::input::InputHandler;
+use amethyst::input::{InputHandler, StringBindings};
 
 use crate::charactermeta::{CharacterDirection, CharacterMeta};
 use crate::physics::{BoundingRect, Physics};
@@ -42,7 +42,7 @@ impl<'s> System<'s> for CharacterMoveSystem {
         ReadStorage<'s, UserMove>,
         ReadStorage<'s, Transform>,
         ReadStorage<'s, BoundingRect>,
-        Read<'s, InputHandler<String, String>>,
+        Read<'s, InputHandler<StringBindings>>,
         Read<'s, LazyUpdate>,
     );
 

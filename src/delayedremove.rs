@@ -1,6 +1,7 @@
 //! Performs a sword attack
 
 use amethyst::{
+    prelude::*,
     core::timing::Time,
     ecs::{Component, DenseVecStorage, Entities, Join, LazyUpdate, Read, System, WriteStorage},
 };

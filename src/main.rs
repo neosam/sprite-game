@@ -4,13 +4,12 @@ extern crate regex;
 extern crate serde;
 
 use amethyst::{
-    config::Config,
+    input::{InputBundle, StringBindings},
     core::transform::{Transform, TransformBundle},
-    input::InputBundle,
     prelude::*,
     renderer::{
-        Camera, ColorMask, DepthMode, DisplayConfig, DrawFlat2D, Pipeline, Projection,
-        RenderBundle, Stage, TargetBuilder, Transparent, ALPHA,
+        Camera, Transparent, RenderToWindow, RenderFlat2D, RenderingBundle,
+        types::DefaultBackend,
     },
     utils::application_root_dir,
 };
@@ -46,16 +45,11 @@ impl SimpleState for Example {
 /// Initialise the camera.
 fn initialise_camera(world: &mut World) {
     let mut transform = Transform::default();
-    transform.set_xyz(0.0, 0.0, 1000.0);
+    transform.set_translation_xyz(0.0, 0.0, 1000.0);
 
     world
         .create_entity()
-        .with(Camera::from(Projection::orthographic(
-            0.0,
-            ARENA_WIDTH,
-            0.0,
-            ARENA_HEIGHT,
-        )))
+        .with(Camera::standard_2d(ARENA_WIDTH, ARENA_HEIGHT))
         .with(transform)
         .build();
 }
@@ -174,30 +168,16 @@ fn generate_surrounding_walls(
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
 
-    let path = format!("{}/resources/display_config.ron", application_root_dir());
-    let binding_path = format!("{}/resources/binding_config.ron", application_root_dir());
-
-    let config = DisplayConfig::load(&path);
-
-    //println!("Loaded animations: {:?}", animations);
+    let app_root = application_root_dir()?;
+    //let path = format!("{}/resources/display_config.ron", root_dir);
+    let binding_path = app_root.join("resources/binding_config.ron");
+    let display_config_path = app_root.join("resources/display_config.ron");
 
     let input_bundle =
-        InputBundle::<String, String>::new().with_bindings_from_file(binding_path)?;
+        InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path)?;
 
-    let pipe = Pipeline::build()
-        .with_target(TargetBuilder::new("asdf").with_depth_buf(true))
-        .with_stage(
-            Stage::with_backbuffer()
-                .clear_target([0., 0., 0., 1.0], 1.0)
-                .with_pass(DrawFlat2D::new().with_transparency(
-                    ColorMask::all(),
-                    ALPHA,
-                    Some(DepthMode::LessEqualTest),
-                )),
-        );
-
+  
     let game_data = GameDataBuilder::default()
-        .with_bundle(RenderBundle::new(pipe, Some(config)).with_sprite_sheet_processor())?
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with(physics::PhysicsSystem, "physics", &[])
@@ -213,7 +193,15 @@ fn main() -> amethyst::Result<()> {
             &["sprite_animation", "character_move"],
         )
         .with(damage::DestroySystem, "destroy", &["physics"])
-        .with(delayedremove::DelayedRemoveSystem, "delayed_remove", &[]);
+        .with(delayedremove::DelayedRemoveSystem, "delayed_remove", &[])
+        .with_bundle(
+            RenderingBundle::<DefaultBackend>::new()
+                .with_plugin(
+                    RenderToWindow::from_config_path(display_config_path)
+                        .with_clear([0.34, 0.36, 0.52, 1.0]),
+                )
+                .with_plugin(RenderFlat2D::default()),
+        )?;
     let mut game = Application::new("./", Example, game_data)?;
 
     game.run();

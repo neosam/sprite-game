@@ -8,9 +8,9 @@ use crate::physics::{BoundingRect, Physics, Solid};
 use crate::spriteanimation::SpriteAnimation;
 use crate::spriteanimationloader::SpriteAnimationStore;
 use amethyst::{
+    prelude::*,
     core::transform::Transform,
     ecs::world::EntityBuilder,
-    prelude::*,
     renderer::{SpriteRender, Transparent},
 };
 
@@ -89,7 +89,7 @@ pub fn create_character<'a>(
         sprite_number: 0,
     };
     let mut transform = Transform::default();
-    transform.set_xyz(x, y, -y);
+    transform.set_translation_xyz(x, y, -y);
 
     println!("Create character end");
 
@@ -136,7 +136,7 @@ pub fn create_solid<'a>(
         sprite_number: *animations.images.get(name).unwrap_or(&0),
     };
     let mut transform = Transform::default();
-    transform.set_xyz(x, y, -y);
+    transform.set_translation_xyz(x, y, -y);
 
     entity_builder
         .with(sprite_render)
@@ -177,7 +177,7 @@ pub fn create_walkable<'a>(
         sprite_number: *animations.images.get(name).unwrap_or(&0),
     };
     let mut transform = Transform::default();
-    transform.set_xyz(x, y, -y);
+    transform.set_translation_xyz(x, y, -y);
 
     entity_builder
         .with(sprite_render)

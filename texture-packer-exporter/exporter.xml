@@ -3,10 +3,10 @@
   <name>neolum</name>
  
   <!-- display name of the exporter for the combo box -->
-  <displayName>neolum ron format</displayName>
+  <displayName>ron animation format</displayName>
  
   <!-- description of the exporter -->
-  <description>Export to the neolum ron format.</description>
+  <description>Export to ron format.</description>
  
   <!-- exporter version -->
   <version>1.0</version>
@@ -25,7 +25,7 @@
           <fileExtension>ron</fileExtension>
  
            <!-- description what the file contains, used in tooltips in the GUI -->
-           <description>Neolum ron format</description>
+           <description>Ron format</description>
 
           <!-- name of the template file -->
           <template>template.xml</template>
