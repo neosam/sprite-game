@@ -77,6 +77,21 @@ impl RoomGeneration {
             room.set_field(self.width - 1, y, wall_borders);
         }
 
+        /* Open exits */
+        if self.exit_north {
+            room.set_field(self.width / 2, self.height - 1, RoomField::Nothing);
+        }
+        if self.exit_south {
+            room.set_field(self.width / 2, 0, RoomField::Nothing);
+        }
+        if self.exit_east {
+            room.set_field(self.width - 1, self.height / 2, RoomField::Nothing);
+        }
+        if self.exit_west {
+            room.set_field(0, self.height / 2, RoomField::Nothing);
+        }
+
+
         /* Draw 5-7 random stones */
         for _ in 0..rng.gen_range(5, 8) {
             let x = rng.gen_range(2, self.width - 3);

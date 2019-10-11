@@ -64,6 +64,7 @@ fn initialize_test_sprite(world: &mut World) {
     let mut room_generation = room::RoomGeneration::default();
     room_generation.width = tiles_x;
     room_generation.height = tiles_y;
+    room_generation.exit_west = true;
     let room = room_generation.generate_room(&mut rand::thread_rng());
 
     for (x, y, field) in room.room_field_iterator() {
