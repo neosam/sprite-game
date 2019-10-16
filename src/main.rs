@@ -32,7 +32,7 @@ pub mod map;
 pub mod roomexit;
 
 struct Example {
-    map: map::Map,
+    map: map::Map<room::Room>,
     room_coordinate: map::Coordinate,
     spawn_player: Option<(i32, i32)>,
 }
@@ -235,8 +235,8 @@ fn main() -> amethyst::Result<()> {
     Ok(())
 }
 
-fn build_map(width: usize, height: usize) -> map::Map {
-    let mut map = map::Map::new();
+fn build_map(width: usize, height: usize) -> map::Map<room::Room> {
+    /*let mut map = map::Map::new();
 
     let mut room_generation1 = room::RoomGeneration::default();
     room_generation1.width = width;
@@ -251,7 +251,11 @@ fn build_map(width: usize, height: usize) -> map::Map {
     let room2 = room_generation2.generate_room(&mut rand::thread_rng());
 
     map.add_room((0, 0), room1);
-    map.add_room((1, 0), room2);
+    map.add_room((1, 0), room2);*/
+    let mut map_gen = map::DungeonGen::default();
+    map_gen.corridor_length = 5;
+    map_gen.splits = 2;
+    let map = map_gen.generate(&mut rand::thread_rng(), width, height).generate_map(&mut rand::thread_rng());
 
     map
 }
