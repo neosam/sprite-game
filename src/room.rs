@@ -1,14 +1,38 @@
 use rand::Rng;
 
 #[derive(Copy, Clone)]
+pub enum DestRoom {
+    Relative(isize, isize, i32, i32,),
+    Absolute(isize, isize, i32, i32,),
+}
+
+impl DestRoom {
+    pub fn to_absolute_coordinates(&self, (x, y): (i32, i32)) -> (i32, i32) {
+        match self {
+            DestRoom::Relative(rel_x, rel_y, _, _) => (x + *rel_x as i32, y + *rel_y as i32),
+            DestRoom::Absolute(abs_x, abs_y, _, _) => (*abs_x as i32, *abs_y as i32),
+        }
+    }
+
+    pub fn spawn_point(&self) -> (i32, i32) {
+        match self {
+            DestRoom::Relative(_, _, x, y) => (*x, *y),
+            DestRoom::Absolute(_, _, x, y) => (*x, *y),
+        }
+    }
+}
+
+#[derive(Copy, Clone)]
 pub enum RoomField {
     Nothing,
     Wall,
     Stone,
     Bush,
     Player,
+    Exit(DestRoom),
 }
 
+#[derive(Clone)]
 pub struct Room {
     pub width: usize,
     pub height: usize,
@@ -79,16 +103,20 @@ impl RoomGeneration {
 
         /* Open exits */
         if self.exit_north {
-            room.set_field(self.width / 2, self.height - 1, RoomField::Nothing);
+            room.set_field(self.width / 2, self.height - 1,
+                RoomField::Exit(DestRoom::Relative(0, -1, self.width as i32 / 2, 1)));
         }
         if self.exit_south {
-            room.set_field(self.width / 2, 0, RoomField::Nothing);
+            room.set_field(self.width / 2, 0,
+                RoomField::Exit(DestRoom::Relative(0, 1, self.width as i32 / 2, self.height as i32 - 2)));
         }
         if self.exit_east {
-            room.set_field(self.width - 1, self.height / 2, RoomField::Nothing);
+            room.set_field(self.width - 1, self.height / 2, 
+                RoomField::Exit(DestRoom::Relative(1, 0, 1, self.height as i32 / 2)));
         }
         if self.exit_west {
-            room.set_field(0, self.height / 2, RoomField::Nothing);
+            room.set_field(0, self.height / 2,
+                RoomField::Exit(DestRoom::Relative(-1, 0, self.width as i32 - 2, self.height as i32 / 2)));
         }
 
 

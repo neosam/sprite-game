@@ -1,11 +1,19 @@
 //! ECS system to move sprites and respect collisions
 
+use amethyst::prelude::*;
 use amethyst::core::timing::Time;
 use amethyst::core::Transform;
+use amethyst::core::shrev::{EventChannel, ReaderId};
 use amethyst::ecs::prelude::ParallelIterator;
 use amethyst::ecs::{Component, VecStorage};
-use amethyst::ecs::{Join, ParJoin, Read, ReadStorage, System, WriteStorage};
+use amethyst::ecs::{Join, ParJoin, Read, Write, ReadStorage, System, WriteStorage, Entities};
 use na::Vector2;
+
+/// Will be sent as an event when the physics engine detects a collision.
+#[derive(Debug)]
+pub enum Collision {
+    Solid(u32, u32)
+}
 
 /// Component which controls the physics of an entity.
 ///
@@ -81,17 +89,19 @@ impl<'s> System<'s> for PhysicsSystem {
         ReadStorage<'s, Solid>,
         WriteStorage<'s, Transform>,
         Read<'s, Time>,
+        Write<'s, EventChannel<Collision>>,
+        Entities<'s>
     );
 
     fn run(
         &mut self,
-        (mut physics, bounding_rects, solids, mut transforms, time): Self::SystemData,
+        (mut physics, bounding_rects, solids, mut transforms, time, mut channel, entities): Self::SystemData,
     ) {
-        (&mut physics, &transforms, &bounding_rects)
-            .par_join()
-            .for_each(|(physics, transform, bounding_rect)| {
-                for (o_transform, o_bounding_rect, _) in
-                    (&transforms, &bounding_rects, &solids).join()
+        (&mut physics, &transforms, &bounding_rects, &entities)
+            .join()
+            .for_each(|(physics, transform, bounding_rect, moving_entity)| {
+                for (o_transform, o_bounding_rect, _, solid_entity) in
+                    (&transforms, &bounding_rects, &solids, &entities).join()
                 {
                     let x = transform.translation().x + physics.velocity.x * time.delta_seconds();
                     let y = transform.translation().y + physics.velocity.y * time.delta_seconds();
@@ -110,6 +120,7 @@ impl<'s> System<'s> for PhysicsSystem {
                     if (max_right_x - min_left_x) < sum_width
                         && (max_top_y - min_bottom_y) < sum_height
                     {
+                        channel.single_write(Collision::Solid(moving_entity.id(), solid_entity.id()));
                         physics.velocity.x = 0.0;
                         physics.velocity.y = 0.0;
                     }
@@ -120,6 +131,38 @@ impl<'s> System<'s> for PhysicsSystem {
             transform.move_right(physics.velocity.x * time.delta_seconds());
             transform.move_up(physics.velocity.y * time.delta_seconds());
             transform.set_translation_z(-transform.translation().y);
+        }
+    }
+}
+
+#[derive(Default)]
+pub struct PhysicsStopOnCollidingSystem {
+    reader: Option<ReaderId<Collision>>
+}
+
+
+impl<'s> System<'s> for PhysicsStopOnCollidingSystem {
+    type SystemData = (
+        WriteStorage<'s, Physics>,
+        ReadStorage<'s, BoundingRect>,
+        ReadStorage<'s, Solid>,
+        WriteStorage<'s, Transform>,
+        Read<'s, Time>,
+        Write<'s, EventChannel<Collision>>,
+        Entities<'s>
+    );
+
+    fn run(
+        &mut self,
+        (mut physics, bounding_rects, solids, mut transforms, time, mut channel, entities): Self::SystemData,
+    ) {
+        if let None = self.reader {
+            self.reader = Some(channel.register_reader());
+        }
+        if let Some(reader) = &mut self.reader {
+            for collision in channel.read(reader) {
+                println!("Collision detected: {:?}", collision);
+            }
         }
     }
 }

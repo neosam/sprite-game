@@ -146,6 +146,21 @@ pub fn create_solid<'a>(
         .with(Solid)
 }
 
+pub fn create_walkable_solid<'a>(
+    entity_builder: EntityBuilder<'a>,
+    (x, y): (f32, f32),
+    (left, right, bottom, top): (f32, f32, f32, f32),
+) -> EntityBuilder<'a> {
+    let mut transform = Transform::default();
+    transform.set_translation_xyz(x, y, -y);
+
+    entity_builder
+        .with(transform)
+        .with(BoundingRect::new(left, right, bottom, top))
+     //   .with(Transparent)
+        .with(Solid)
+}
+
 /// Assebles a walkable entity
 ///
 /// Assigns the components to the EntityBuilder which are required

@@ -6,6 +6,8 @@ extern crate serde;
 use amethyst::{
     input::{InputBundle, StringBindings},
     core::transform::{Transform, TransformBundle},
+    core::shrev::{EventChannel, ReaderId},
+    ecs::{ReadStorage, WriteStorage},
     prelude::*,
     renderer::{
         Camera, Transparent, RenderToWindow, RenderFlat2D, RenderingBundle,
@@ -13,6 +15,7 @@ use amethyst::{
     },
     utils::application_root_dir,
 };
+
 
 pub mod characteranimation;
 pub mod charactermeta;
@@ -26,10 +29,12 @@ pub mod spriteanimationloader;
 pub mod swordattack;
 pub mod room;
 pub mod map;
+pub mod roomexit;
 
 struct Example {
     map: map::Map,
     room_coordinate: map::Coordinate,
+    spawn_player: Option<(i32, i32)>,
 }
 
 pub const ARENA_WIDTH: f32 = 640.0;
@@ -44,6 +49,31 @@ impl SimpleState for Example {
 
         initialise_camera(world);
         initialize_test_sprite(self, world);
+    }
+
+    fn update(&mut self, game_state: &mut StateData<GameData>) -> SimpleTrans {
+        use crate::roomexit::PerformRoomExit;
+        let mut trans = SimpleTrans::None;
+        {
+            let mut perform_room_exits = game_state.world.fetch_mut::<Option<roomexit::PerformRoomExit>>();
+            if let Some(PerformRoomExit(dest_room, spawn_coordinates)) = &*perform_room_exits {
+                let room_coordinate = dest_room.to_absolute_coordinates(self.room_coordinate);
+                println!("New coordinate: {:?}", room_coordinate);
+                let new_state = Example {
+                    map: self.map.clone(),
+                    room_coordinate,
+                    spawn_player: Some(*spawn_coordinates),
+                };
+                *perform_room_exits = None;
+                trans = SimpleTrans::Push(Box::new(new_state))
+            }
+        }
+        if let SimpleTrans::None = trans {
+            trans
+        } else {
+            game_state.world.delete_all();
+            trans
+        }
     }
 }
 
@@ -65,14 +95,16 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
     // Generate a room
     let tiles_x = ARENA_WIDTH as usize / 32;
     let tiles_y = ARENA_HEIGHT as usize / 32;
+    println!("Getting room: {:?}", scene.room_coordinate);
     let room = scene.map.get_room((scene.room_coordinate)).unwrap();
+    let hitbox = (-14.0, 14.0, -14.0, 14.0);
 
     for (x, y, field) in room.room_field_iterator() {
         let pixel_pos = (
             x as f32 * 32.0 + 16.0,
             y as f32 * 32.0 + 16.0,
         );
-        let hitbox = (-14.0, 14.0, -14.0, 14.0);
+        
         match field {
             room::RoomField::Nothing => {},
             room::RoomField::Wall => {
@@ -107,18 +139,46 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                 .build();
             },
             room::RoomField::Player => {
-                helper::create_character(
+                if let None = scene.spawn_player {
+                    helper::create_character(
+                        world.create_entity(),
+                        &sprite_animations,
+                        pixel_pos,
+                        hitbox,
+                        "healer",
+                    )
+                    .with(charactermove::UserMove)
+                    // .with(damage::Destroyer { damage: 1.0})
+                    .build();
+                }
+            },
+            room::RoomField::Exit(direction) => {
+                helper::create_walkable_solid(
                     world.create_entity(),
-                    &sprite_animations,
                     pixel_pos,
                     hitbox,
-                    "healer",
                 )
-                .with(charactermove::UserMove)
+                .with(direction)
                 // .with(damage::Destroyer { damage: 1.0})
                 .build();
-            }
+            },
         }
+    }
+    if let Some(player_coordinate) = scene.spawn_player {
+        let pixel_pos = (
+            player_coordinate.0 as f32 * 32.0 + 16.0,
+            player_coordinate.1 as f32 * 32.0 + 16.0,
+        );
+        helper::create_character(
+            world.create_entity(),
+            &sprite_animations,
+            pixel_pos,
+            hitbox,
+            "healer",
+        )
+        .with(charactermove::UserMove)
+        // .with(damage::Destroyer { damage: 1.0})
+        .build();
     }
 }
 
@@ -132,12 +192,12 @@ fn main() -> amethyst::Result<()> {
 
     let input_bundle =
         InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path)?;
-
   
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         .with(physics::PhysicsSystem, "physics", &[])
+        .with(roomexit::RoomExitSystem::default(), "roomexit", &["physics"])
         .with(
             spriteanimation::SpriteAnimationSystem,
             "sprite_animation",
@@ -165,6 +225,7 @@ fn main() -> amethyst::Result<()> {
     let scene = Example {
         map: build_map(tiles_x, tiles_y),
         room_coordinate: (0, 0),
+        spawn_player: None,
     };
 
     let mut game = Application::new("./", scene, game_data)?;
@@ -186,8 +247,8 @@ fn build_map(width: usize, height: usize) -> map::Map {
     let mut room_generation2 = room::RoomGeneration::default();
     room_generation2.width = width;
     room_generation2.height = height;
-    room_generation1.exit_west = true;
-    let room2 = room_generation1.generate_room(&mut rand::thread_rng());
+    room_generation2.exit_west = true;
+    let room2 = room_generation2.generate_room(&mut rand::thread_rng());
 
     map.add_room((0, 0), room1);
     map.add_room((1, 0), room2);

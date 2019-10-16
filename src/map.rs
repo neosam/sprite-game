@@ -3,6 +3,7 @@ use crate::room::Room;
 
 pub type Coordinate = (i32, i32);
 
+#[derive(Clone)]
 pub struct Map {
     rooms: BTreeMap<Coordinate, Room>
 }
