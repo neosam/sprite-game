@@ -254,7 +254,7 @@ fn build_map(width: usize, height: usize) -> map::Map<room::Room> {
     map.add_room((1, 0), room2);*/
     let mut map_gen = map::DungeonGen::default();
     map_gen.corridor_length = 5;
-    map_gen.splits = 2;
+    map_gen.splits = 4;
     let map = map_gen.generate(&mut rand::thread_rng(), width, height).generate_map(&mut rand::thread_rng());
 
     map

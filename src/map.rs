@@ -96,44 +96,59 @@ impl Direction {
         }
     }
 }
-
+fn generate_corridor(map: &mut Map<RoomGeneration>, rng: &mut impl Rng, width: usize, height: usize, corridor_length: u32, mut coordinate: (i32, i32)) -> Vec<(i32,i32)> {
+    let mut coordinate_stack = Vec::new();
+    for _ in 0..corridor_length {
+        let choice = {
+            let mut i = 0;
+            loop {
+                if i == 8 {
+                    break None
+                }
+                i += 1;
+                let direction: Direction = rng.gen();
+                let new_coordinate = direction.add(coordinate);
+                println!("Map gen: {:?}, {:?}", coordinate, new_coordinate);
+                if !map.has_room(new_coordinate) {
+                    break Some((direction, new_coordinate))
+                }
+            }
+        };
+        if let Some((direction, new_coordinate)) = choice {
+            direction.set_exit(map.get_room_mut(coordinate).unwrap());
+            coordinate_stack.push(coordinate);
+            coordinate = new_coordinate;
+            let mut new_room = RoomGeneration::default();
+            new_room.width = width;
+            new_room.height = height;
+            direction.reverse().set_exit(&mut new_room);
+            map.add_room(coordinate, new_room);
+        }
+    }
+    coordinate_stack
+}
 impl DungeonGen {
+    
+
     pub fn generate(&self, rng: &mut impl Rng, width: usize, height: usize) -> Map<RoomGeneration> {
         let mut map = Map::new();
-        let mut coordinate_stack = Vec::new();
+        let mut coordinate_stack: Vec<(i32, i32)> = Vec::new();
         let mut coordinate = (0, 0);
         let mut room = RoomGeneration::default();
         room.width = width;
         room.height = height;
         map.add_room(coordinate, room);
-        for _ in 0..self.corridor_length {
-            let choice = {
-                let mut i = 0;
-                loop {
-                    if i == 8 {
-                        break None
-                    }
-                    i += 1;
-                    let direction: Direction = rng.gen();
-                    let new_coordinate = direction.add(coordinate);
-                    println!("Map gen: {:?}, {:?}", coordinate, new_coordinate);
-                    if !map.has_room(new_coordinate) {
-                        break Some((direction, new_coordinate))
-                    }
-                }
-            };
-            if let Some((direction, new_coordinate)) = choice {
-                direction.set_exit(map.get_room_mut(coordinate).unwrap());
-                coordinate_stack.push(coordinate);
-                coordinate = new_coordinate;
-                let mut new_room = RoomGeneration::default();
-                new_room.width = width;
-                new_room.height = height;
-                direction.reverse().set_exit(&mut new_room);
-                map.add_room(coordinate, new_room);
+        for _ in 0..self.splits {
+            let mut new_stack = generate_corridor(&mut map, rng, width, height, 
+                self.corridor_length - coordinate_stack.len() as u32, coordinate);
+            coordinate_stack.append(&mut new_stack);
+            println!("Stack size before: {}", coordinate_stack.len());
+            for _ in 0..rng.gen_range(0, coordinate_stack.len() - 1) {
+                coordinate_stack.pop();
             }
+            coordinate = *coordinate_stack.last().unwrap_or(&(0, 0));
+            println!("Stack size after: {}", coordinate_stack.len());
         }
-
         map
     }
 }
