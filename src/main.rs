@@ -156,7 +156,7 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                 helper::create_walkable_solid(
                     world.create_entity(),
                     pixel_pos,
-                    hitbox,
+                    (-1.0, 1.0, -1.0, 1.0),
                 )
                 .with(direction)
                 // .with(damage::Destroyer { damage: 1.0})
