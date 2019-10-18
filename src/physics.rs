@@ -7,6 +7,7 @@ use amethyst::core::shrev::{EventChannel, ReaderId};
 use amethyst::ecs::prelude::ParallelIterator;
 use amethyst::ecs::{Component, VecStorage};
 use amethyst::ecs::{Join, ParJoin, Read, Write, ReadStorage, System, WriteStorage, Entities};
+use amethyst::core::math::Vector3;
 use na::Vector2;
 
 /// Will be sent as an event when the physics engine detects a collision.
@@ -97,6 +98,14 @@ impl<'s> System<'s> for PhysicsSystem {
         &mut self,
         (mut physics, bounding_rects, solids, mut transforms, time, mut channel, entities): Self::SystemData,
     ) {
+        let mut position_corrections = Vec::new();
+ 
+        for (physics, transform) in (&physics, &mut transforms).join() {
+            transform.move_right(physics.velocity.x * time.delta_seconds());
+            transform.move_up(physics.velocity.y * time.delta_seconds());
+            transform.set_translation_z(-transform.translation().y);
+        }
+        
         (&mut physics, &transforms, &bounding_rects, &entities)
             .join()
             .for_each(|(physics, transform, bounding_rect, moving_entity)| {
@@ -117,20 +126,33 @@ impl<'s> System<'s> for PhysicsSystem {
                         + (o_bounding_rect.right - o_bounding_rect.left);
                     let sum_height = (bounding_rect.top - bounding_rect.bottom)
                         + (o_bounding_rect.top - o_bounding_rect.bottom);
-                    if (max_right_x - min_left_x) < sum_width
-                        && (max_top_y - min_bottom_y) < sum_height
-                    {
+                    let intersect_x = sum_width - (max_right_x - min_left_x);
+                    let intersect_y = sum_height - (max_top_y - min_bottom_y);
+                    if intersect_x > 0.0 && intersect_y > 0.0 {
                         channel.single_write(Collision::Solid(moving_entity.id(), solid_entity.id()));
-                        physics.velocity.x = 0.0;
-                        physics.velocity.y = 0.0;
+                        let correction_x = if physics.velocity.x > 0.0 {
+                            -intersect_x
+                        } else {
+                            intersect_x
+                        };
+                        let correction_y = if physics.velocity.y > 0.0 {
+                            -intersect_y
+                        } else {
+                            intersect_y
+                        };
+                        if intersect_x > intersect_y {
+                            position_corrections.push((moving_entity, (0.0, correction_y)));
+                        } else {
+                            position_corrections.push((moving_entity, (correction_x, 0.0)));
+                        }
                     }
                 }
             });
 
-        for (physics, transform) in (&physics, &mut transforms).join() {
-            transform.move_right(physics.velocity.x * time.delta_seconds());
-            transform.move_up(physics.velocity.y * time.delta_seconds());
-            transform.set_translation_z(-transform.translation().y);
+        for (entity, (delta_x, delta_y)) in position_corrections {
+            if let Some(transform) = transforms.get_mut(entity) {
+                transform.append_translation(Vector3::new(delta_x, delta_y, 0.0));
+            }
         }
     }
 }
