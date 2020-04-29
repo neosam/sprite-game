@@ -2,15 +2,15 @@ extern crate amethyst;
 extern crate nalgebra as na;
 extern crate regex;
 extern crate serde;
+#[macro_use]
+extern crate log;
 
 use amethyst::{
     input::{InputBundle, StringBindings},
     core::transform::{Transform, TransformBundle},
-    core::shrev::{EventChannel, ReaderId},
-    ecs::{ReadStorage, WriteStorage},
     prelude::*,
     renderer::{
-        Camera, Transparent, RenderToWindow, RenderFlat2D, RenderingBundle,
+        Camera, RenderToWindow, RenderFlat2D, RenderingBundle,
         types::DefaultBackend,
     },
     utils::application_root_dir,
@@ -30,6 +30,7 @@ pub mod swordattack;
 pub mod room;
 pub mod map;
 pub mod roomexit;
+// pub mod simpleenemy;
 
 struct Example {
     map: map::Map<room::Room>,
@@ -47,7 +48,9 @@ impl SimpleState for Example {
         //world.register::<SpriteRender>();
         //world.register::<Transparent>();
 
+        info!("Initialize camera");
         initialise_camera(world);
+        info!("Initialize sprites");
         initialize_test_sprite(self, world);
     }
 
@@ -90,13 +93,12 @@ fn initialise_camera(world: &mut World) {
 }
 
 fn initialize_test_sprite(scene: &Example, world: &mut World) {
+    info!("Loading sprites");
     let sprite_animations = spriteanimationloader::load_sprites(world, "texture", "tp-export.ron");
 
     // Generate a room
-    let tiles_x = ARENA_WIDTH as usize / 32;
-    let tiles_y = ARENA_HEIGHT as usize / 32;
     println!("Getting room: {:?}", scene.room_coordinate);
-    let room = scene.map.get_room((scene.room_coordinate)).unwrap();
+    let room = scene.map.get_room(scene.room_coordinate).unwrap();
     let hitbox = (-14.0, 14.0, -14.0, 14.0);
 
     for (x, y, field) in room.room_field_iterator() {
@@ -184,14 +186,19 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
 
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
+    info!("starting up");
+
 
     let app_root = application_root_dir()?;
     //let path = format!("{}/resources/display_config.ron", root_dir);
     let binding_path = app_root.join("resources/binding_config.ron");
     let display_config_path = app_root.join("resources/display_config.ron");
+    info!("binding_path: {:?}", binding_path.to_str());
 
     let input_bundle =
         InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path)?;
+
+    info!("Info bundle loaded");
   
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
@@ -214,12 +221,14 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(
-                    RenderToWindow::from_config_path(display_config_path)
+                    RenderToWindow::from_config_path(display_config_path)?
                         .with_clear([0.34, 0.36, 0.52, 1.0]),
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?;
 
+
+    info!("Generate map");
     let tiles_x = ARENA_WIDTH as usize / 32;
     let tiles_y = ARENA_HEIGHT as usize / 32;
     let scene = Example {
@@ -228,8 +237,10 @@ fn main() -> amethyst::Result<()> {
         spawn_player: None,
     };
 
+    info!("Create game");
     let mut game = Application::new("./", scene, game_data)?;
 
+    info!("Run game");
     game.run();
 
     Ok(())

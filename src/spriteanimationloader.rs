@@ -93,10 +93,11 @@ pub fn load_sprites(
     filename: impl ToString,
 ) -> SpriteAnimationStore {
     // ---- Loading animations
+    info!("Loading animations");
     let directory = directory.to_string();
     let filename = filename.to_string();
     let ron_path = format!("{}/{}", directory, filename);
-    let mut animations = AnimationData::load(ron_path);
+    let mut animations = AnimationData::load(ron_path).expect("Animation data should load");
     manually_assign_animations(&mut animations);
     let texture_path = format!("{}/{}", directory, animations.texture_path);
     let texture_handle = {

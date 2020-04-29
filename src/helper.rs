@@ -11,7 +11,7 @@ use amethyst::{
     prelude::*,
     core::transform::Transform,
     ecs::world::EntityBuilder,
-    renderer::{SpriteRender, Transparent},
+    renderer::{SpriteRender},
 };
 
 /// Assebles a character on the map

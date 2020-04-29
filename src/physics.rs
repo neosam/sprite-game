@@ -1,12 +1,10 @@
 //! ECS system to move sprites and respect collisions
 
-use amethyst::prelude::*;
 use amethyst::core::timing::Time;
 use amethyst::core::Transform;
 use amethyst::core::shrev::{EventChannel, ReaderId};
-use amethyst::ecs::prelude::ParallelIterator;
 use amethyst::ecs::{Component, VecStorage};
-use amethyst::ecs::{Join, ParJoin, Read, Write, ReadStorage, System, WriteStorage, Entities};
+use amethyst::ecs::{Join, Read, Write, ReadStorage, System, WriteStorage, Entities};
 use amethyst::core::math::Vector3;
 use na::Vector2;
 
@@ -176,7 +174,7 @@ impl<'s> System<'s> for PhysicsStopOnCollidingSystem {
 
     fn run(
         &mut self,
-        (mut physics, bounding_rects, solids, mut transforms, time, mut channel, entities): Self::SystemData,
+        (_physics, _bounding_rects, _solids, _transforms, _time, mut channel, _entities): Self::SystemData,
     ) {
         if let None = self.reader {
             self.reader = Some(channel.register_reader());

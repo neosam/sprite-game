@@ -1,5 +1,5 @@
 use amethyst::core::shrev::{EventChannel, ReaderId};
-use amethyst::ecs::{Join, ParJoin, Read, Write, ReadStorage, System, WriteStorage, Entities};
+use amethyst::ecs::{Write, ReadStorage, System, Entities};
 use amethyst::ecs::{Component, VecStorage};
 use amethyst::core::transform::Transform;
 
@@ -41,7 +41,7 @@ impl<'s> System<'s> for RoomExitSystem {
                     Collision::Solid(_moving_entity_id, solid_entity_id) => {
                         let solid_entity = entities.entity(*solid_entity_id);
                         if let Some(exit) = destrooms.get(solid_entity) {
-                            if let Some(transform) = transforms.get(solid_entity) {
+                            if let Some(_transform) = transforms.get(solid_entity) {
                                 let position = exit.spawn_point();
                                 *perform_room_exit = Some(PerformRoomExit(*exit, position));
                                 println!("Exit collision");
