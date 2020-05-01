@@ -17,7 +17,6 @@ use amethyst::{
     utils::application_root_dir,
 };
 use specs_physics:: {
-    nalgebra::RealField,
     systems::*,
 };
 
@@ -26,13 +25,13 @@ use specs_physics:: {
 pub mod characteranimation;
 pub mod charactermeta;
 pub mod charactermove;
-// pub mod damage;
+pub mod damage;
 pub mod delayedremove;
 pub mod helper;
 pub mod physics;
 pub mod spriteanimation;
 pub mod spriteanimationloader;
-// pub mod swordattack;
+pub mod swordattack;
 pub mod room;
 pub mod map;
 pub mod roomexit;
@@ -105,7 +104,6 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
     // Generate a room
     println!("Getting room: {:?}", scene.room_coordinate);
     let room = scene.map.get_room(scene.room_coordinate).unwrap();
-    let hitbox = (-14.0, 14.0, -14.0, 14.0);
 
     for (x, y, field) in room.room_field_iterator() {
         let pixel_pos = (
@@ -121,7 +119,6 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                     world.create_entity(),
                     &sprite_animations,
                     pixel_pos,
-                    hitbox,
                     "brick",
                 ).build();
             },
@@ -131,7 +128,6 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                     world.create_entity(),
                     &sprite_animations,
                     pixel_pos,
-                    hitbox,
                     "stones",
                 ).build();
             },
@@ -141,9 +137,8 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                     world.create_entity(),
                     &sprite_animations,
                     pixel_pos,
-                    hitbox,
                     "bush",
-                )//.with(damage::Destroyable { health: 2.0 })
+                ).with(damage::Destroyable { health: 2.0 })
                 .build();
             },
             room::RoomField::Player => {
@@ -152,7 +147,6 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                         world.create_entity(),
                         &sprite_animations,
                         pixel_pos,
-                        hitbox,
                         "healer",
                     )
                     .with(charactermove::UserMove)
@@ -164,7 +158,6 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                 helper::create_walkable_solid(
                     world.create_entity(),
                     pixel_pos,
-                    (-1.0, 1.0, -1.0, 1.0),
                 )
                 .with(direction)
                 // .with(damage::Destroyer { damage: 1.0})
@@ -182,7 +175,6 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
             world.create_entity(),
             &sprite_animations,
             pixel_pos,
-            hitbox,
             "healer",
         )
         .with(charactermove::UserMove)
@@ -212,23 +204,22 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         //.with(physics::PhysicsSystem, "physics", &[])
-        
+        .with(delayedremove::DelayedRemoveSystem, "delayed_remove", &[])
         .with(
             spriteanimation::SpriteAnimationSystem,
             "sprite_animation",
             &[],
         )
-        .with(charactermove::CharacterMoveSystem, "character_move", &[])
+        .with(charactermove::CharacterMoveSystem::default(), "character_move", &[])
         .with(
             characteranimation::CharacterAnimationSystem,
             "character_animation",
             &["sprite_animation", "character_move"],
         )
-        //.with(damage::DestroySystem, "destroy", &["physics"])
-        .with(delayedremove::DelayedRemoveSystem, "delayed_remove", &[])
+        
         .with(SyncBodiesToPhysicsSystem::<f32, Transform>::default(),
             "sync_bodies_to_physics_system",
-            &["character_move"],
+            &["character_move", "delayed_remove"],
         )
         .with(SyncCollidersToPhysicsSystem::<f32, Transform>::default(),
             "sync_colliders_to_physics_system",
@@ -251,6 +242,7 @@ fn main() -> amethyst::Result<()> {
             &["physics_stepper_system"],
         )
         .with(roomexit::RoomExitSystem::default(), "roomexit", &["sync_bodies_from_physics_system"])
+        .with(damage::DestroySystem::default(), "destroy", &["sync_bodies_from_physics_system"])
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(

@@ -11,19 +11,15 @@ use amethyst::{
     core::transform::Transform,
     ecs::world::EntityBuilder,
     renderer::{SpriteRender},
-    ecs::Component,
 };
 use specs_physics::{PhysicsBodyBuilder, PhysicsBody,
     nphysics::object::BodyStatus,
-    nalgebra::{Point3, Vector3},
-    nphysics::{algebra::Velocity3},
-    Physics,
+    nalgebra::{Vector3},
     PhysicsColliderBuilder,
     PhysicsCollider,
     colliders::Shape,
 };
-use specs_physics::{bodies::Position, nalgebra::Isometry3};
-/// Assebles a character on the map
+/// Assembles a character on the map
 ///
 /// Assigns the components to the EntityBuilder which are required
 /// to have a moving character on the screen.
@@ -51,7 +47,6 @@ pub fn create_character<'a>(
     entity_builder: EntityBuilder<'a>,
     animations: &SpriteAnimationStore,
     (x, y): (f32, f32),
-    (left, right, bottom, top): (f32, f32, f32, f32),
     char_name: &str,
 ) -> EntityBuilder<'a> {
     println!("Create character start");
@@ -150,7 +145,6 @@ pub fn create_solid<'a>(
     entity_builder: EntityBuilder<'a>,
     animations: &SpriteAnimationStore,
     (x, y): (f32, f32),
-    (left, right, bottom, top): (f32, f32, f32, f32),
     name: &str,
 ) -> EntityBuilder<'a> {
     let sprite_render = SpriteRender {
@@ -180,7 +174,6 @@ pub fn create_solid<'a>(
 pub fn create_walkable_solid<'a>(
     entity_builder: EntityBuilder<'a>,
     (x, y): (f32, f32),
-    (left, right, bottom, top): (f32, f32, f32, f32),
 ) -> EntityBuilder<'a> {
     let mut transform = Transform::default();
     transform.set_translation_xyz(x, y, -y);
@@ -225,7 +218,6 @@ pub fn create_walkable<'a>(
     entity_builder: EntityBuilder<'a>,
     animations: &SpriteAnimationStore,
     (x, y): (f32, f32),
-    (left, right, bottom, top): (f32, f32, f32, f32),
     name: &str,
 ) -> EntityBuilder<'a> {
     let sprite_render = SpriteRender {

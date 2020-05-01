@@ -2,13 +2,13 @@
 
 use amethyst::core::Transform;
 use amethyst::ecs::{Component, DenseVecStorage, LazyUpdate};
-use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage, Write};
+use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
 use amethyst::input::{InputHandler, StringBindings};
 use specs_physics::PhysicsBody;
-use specs_physics::nphysics::algebra::{Velocity3, Force3};
+use specs_physics::nphysics::algebra::Velocity3;
 
 use crate::charactermeta::{CharacterDirection, CharacterMeta};
-//use crate::swordattack::sword_attack;
+use crate::swordattack::sword_attack;
 
 /// Ability to let the character move.
 pub struct CharacterMove {
@@ -33,7 +33,16 @@ impl Component for UserMove {
 }
 
 /// System to handle user input and set the speed.
-pub struct CharacterMoveSystem;
+pub struct CharacterMoveSystem {
+    attack_released: bool
+}
+impl Default for CharacterMoveSystem {
+    fn default() -> Self {
+        CharacterMoveSystem {
+            attack_released: true
+        }
+    }
+}
 
 impl<'s> System<'s> for CharacterMoveSystem {
     type SystemData = (
@@ -96,18 +105,20 @@ impl<'s> System<'s> for CharacterMoveSystem {
             } 
             if !movement {
                 character_meta.moving = false;
-            } else {
-                info!("Moving");
             }
             physics_body.velocity = Velocity3::linear(velocity_x, velocity_y, 0.0);
-            // if input.action_is_down("attack").unwrap() {
-            //     let transform: Transform = transform.clone();
-            //     let bounding_rect: BoundingRect = bounding_rect.clone();
-            //     let direction: CharacterDirection = character_meta.direction.clone();
-            //     lazy_update.exec_mut(move |world| {
-            //         sword_attack(world, 1.0, transform, bounding_rect, direction);
-            //     });
-            // }
+            if input.action_is_down("attack").unwrap() {
+                if self.attack_released {
+                    self.attack_released = false;
+                    let transform: Transform = transform.clone();
+                    let direction: CharacterDirection = character_meta.direction.clone();
+                    lazy_update.exec_mut(move |world| {
+                        sword_attack(world, 1.0, transform, direction);
+                    });
+                }
+            } else {
+                self.attack_released = true;
+            }
         }
     }
 }

@@ -1,9 +1,8 @@
 //! Performs a sword attack
 
 use amethyst::{
-    prelude::*,
     core::timing::Time,
-    ecs::{Component, DenseVecStorage, Entities, Join, LazyUpdate, Read, System, WriteStorage},
+    ecs::{Component, DenseVecStorage, Entities, Join, System, WriteStorage, Read},
 };
 
 pub struct DelayedRemove {
@@ -22,21 +21,19 @@ impl DelayedRemove {
 pub struct DelayedRemoveSystem;
 impl<'s> System<'s> for DelayedRemoveSystem {
     type SystemData = (
-        Read<'s, LazyUpdate>,
         Read<'s, Time>,
         Entities<'s>,
         WriteStorage<'s, DelayedRemove>,
     );
 
-    fn run(&mut self, (lazy_update, time, entities, mut delayed_removes): Self::SystemData) {
+    fn run(&mut self, (time, entities, mut delayed_removes): Self::SystemData) {
         for (delayed_remove, entity) in (&mut delayed_removes, &entities).join() {
             delayed_remove.current += time.delta_seconds();
             if delayed_remove.current > delayed_remove.end {
-                lazy_update.exec_mut(move |world| {
-                    if let Err(err) = world.delete_entity(entity) {
-                        println!("Couldn't remove entity.  Error: {}", err);
-                    }
-                })
+                info!("Delayed remove of {}", entity.id());
+                if let Err(error) = entities.delete(entity) {
+                    warn!("Delayed remove of {} failed: {}", entity.id(), error);
+                }
             }
         }
     }

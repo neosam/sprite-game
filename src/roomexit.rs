@@ -1,5 +1,5 @@
-use amethyst::core::shrev::{EventChannel, ReaderId};
-use amethyst::ecs::{Write, ReadStorage, System, Entities};
+use amethyst::core::shrev::{ReaderId};
+use amethyst::ecs::{Write, ReadStorage, System};
 use amethyst::ecs::{Component, VecStorage};
 use amethyst::core::transform::Transform;
 
@@ -30,14 +30,13 @@ impl<'s> System<'s> for RoomExitSystem {
     type SystemData = (
         Write<'s, ProximityEvents>,
         ReadStorage<'s, DestRoom>,
-        Entities<'s>,
         Write<'s, Option<PerformRoomExit>>,
         ReadStorage<'s, Transform>,
     );
 
     fn run(
         &mut self,
-        (mut channel, destrooms, entities, mut perform_room_exit, transforms,): Self::SystemData,
+        (mut channel, destrooms, mut perform_room_exit, transforms,): Self::SystemData,
     ) {
         if let None = self.reader {
             self.reader = Some(channel.register_reader());
