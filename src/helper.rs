@@ -101,14 +101,11 @@ pub fn create_character<'a>(
     transform.set_translation_xyz(x, y, -y);
 
     let physics_body: PhysicsBody<f32> = PhysicsBodyBuilder::from(BodyStatus::Dynamic)
-        .mass(1.0)
-        .local_center_of_mass(Point3::new(0.0, 0.0, 0.0))
-        .velocity(Velocity3::linear(8.0, 0.0, 0.0))
         .lock_rotations(true)
         .build();
     let physics_collider: PhysicsCollider<f32> =
         PhysicsColliderBuilder::from(Shape::Cuboid {
-            half_extents: Vector3::new(15.0, 15.0, 300.0)
+            half_extents: Vector3::new(13.0, 13.0, 300.0)
         })
         .angular_prediction(0.0)
         .build();
@@ -187,18 +184,28 @@ pub fn create_walkable_solid<'a>(
 ) -> EntityBuilder<'a> {
     let mut transform = Transform::default();
     transform.set_translation_xyz(x, y, -y);
+    let physics_body: PhysicsBody<f32> = PhysicsBodyBuilder::from(BodyStatus::Static)
+        .build();
+    let physics_collider: PhysicsCollider<f32> =
+        PhysicsColliderBuilder::from(Shape::Cuboid {
+            half_extents: Vector3::new(16.0, 16.0, 300.0)
+        })
+        .sensor(true)
+        .build();
 
     entity_builder
         .with(transform)
+        .with(physics_body)
+        .with(physics_collider)
      //   .with(BoundingRect::new(left, right, bottom, top))
      //   .with(Transparent)
      //   .with(Solid)
 }
 
-/// Assebles a walkable entity
+/// Assembles a walkable entity
 ///
 /// Assigns the components to the EntityBuilder which are required
-/// to have a solid enity.
+/// to have a solid entity.
 ///
 /// The name must match the sprite name in.
 ///

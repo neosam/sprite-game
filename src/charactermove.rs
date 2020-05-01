@@ -96,6 +96,8 @@ impl<'s> System<'s> for CharacterMoveSystem {
             } 
             if !movement {
                 character_meta.moving = false;
+            } else {
+                info!("Moving");
             }
             physics_body.velocity = Velocity3::linear(velocity_x, velocity_y, 0.0);
             // if input.action_is_down("attack").unwrap() {

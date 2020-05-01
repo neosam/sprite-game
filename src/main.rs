@@ -35,7 +35,7 @@ pub mod spriteanimationloader;
 // pub mod swordattack;
 pub mod room;
 pub mod map;
-// pub mod roomexit;
+pub mod roomexit;
 // pub mod simpleenemy;
 
 struct Example {
@@ -61,7 +61,7 @@ impl SimpleState for Example {
     }
 
     fn update(&mut self, game_state: &mut StateData<GameData>) -> SimpleTrans {
-        /*use crate::roomexit::PerformRoomExit;
+        use crate::roomexit::PerformRoomExit;
         let mut trans = SimpleTrans::None;
         {
             let mut perform_room_exits = game_state.world.fetch_mut::<Option<roomexit::PerformRoomExit>>();
@@ -82,8 +82,7 @@ impl SimpleState for Example {
         } else {
             game_state.world.delete_all();
             trans
-        }*/
-        SimpleTrans::None
+        }
     }
 }
 
@@ -167,13 +166,14 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                     pixel_pos,
                     (-1.0, 1.0, -1.0, 1.0),
                 )
-                //.with(direction)
+                .with(direction)
                 // .with(damage::Destroyer { damage: 1.0})
                 .build();
             },
         }
     }
     if let Some(player_coordinate) = scene.spawn_player {
+        info!("Setting player coordinates");
         let pixel_pos = (
             player_coordinate.0 as f32 * 32.0 + 16.0,
             player_coordinate.1 as f32 * 32.0 + 16.0,
@@ -185,10 +185,11 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
             hitbox,
             "healer",
         )
-        //.with(charactermove::UserMove)
+        .with(charactermove::UserMove)
         // .with(damage::Destroyer { damage: 1.0})
         .build();
     }
+    info!("Room setup complete");
 }
 
 fn main() -> amethyst::Result<()> {
@@ -211,7 +212,7 @@ fn main() -> amethyst::Result<()> {
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
         //.with(physics::PhysicsSystem, "physics", &[])
-        //.with(roomexit::RoomExitSystem::default(), "roomexit", &["physics"])
+        
         .with(
             spriteanimation::SpriteAnimationSystem,
             "sprite_animation",
@@ -249,6 +250,7 @@ fn main() -> amethyst::Result<()> {
             "sync_bodies_from_physics_system",
             &["physics_stepper_system"],
         )
+        .with(roomexit::RoomExitSystem::default(), "roomexit", &["sync_bodies_from_physics_system"])
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(

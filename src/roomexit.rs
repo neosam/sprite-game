@@ -4,7 +4,7 @@ use amethyst::ecs::{Component, VecStorage};
 use amethyst::core::transform::Transform;
 
 
-use crate::physics::Collision;
+use specs_physics::events::{ProximityEvent, ProximityEvents};
 use crate::room::DestRoom;
 use crate::room;
 
@@ -14,14 +14,21 @@ impl Component for DestRoom {
 
 pub struct PerformRoomExit(pub room::DestRoom, pub (i32, i32));
 
-#[derive(Default)]
 pub struct RoomExitSystem {
-    reader: Option<ReaderId<Collision>>
+    reader: Option<ReaderId<ProximityEvent>>
+}
+
+impl Default for RoomExitSystem {
+    fn default() -> Self {
+        RoomExitSystem {
+            reader: None
+        }
+    }
 }
 
 impl<'s> System<'s> for RoomExitSystem {
     type SystemData = (
-        Write<'s, EventChannel<Collision>>,
+        Write<'s, ProximityEvents>,
         ReadStorage<'s, DestRoom>,
         Entities<'s>,
         Write<'s, Option<PerformRoomExit>>,
@@ -37,16 +44,18 @@ impl<'s> System<'s> for RoomExitSystem {
         }
         if let Some(reader) = &mut self.reader {
             for collision in channel.read(reader) {
-                match collision {
-                    Collision::Solid(_moving_entity_id, solid_entity_id) => {
-                        let solid_entity = entities.entity(*solid_entity_id);
-                        if let Some(exit) = destrooms.get(solid_entity) {
-                            if let Some(_transform) = transforms.get(solid_entity) {
-                                let position = exit.spawn_point();
-                                *perform_room_exit = Some(PerformRoomExit(*exit, position));
-                                println!("Exit collision");
-                            }
-                        }
+                let solid_entity = collision.collider1;
+                if let Some(exit) = destrooms.get(solid_entity) {
+                    if let Some(_transform) = transforms.get(solid_entity) {
+                        let position = exit.spawn_point();
+                        *perform_room_exit = Some(PerformRoomExit(*exit, position));
+                    }
+                }
+                let solid_entity = collision.collider2;
+                if let Some(exit) = destrooms.get(solid_entity) {
+                    if let Some(_transform) = transforms.get(solid_entity) {
+                        let position = exit.spawn_point();
+                        *perform_room_exit = Some(PerformRoomExit(*exit, position));
                     }
                 }
             }
