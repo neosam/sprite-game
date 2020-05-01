@@ -3479,6 +3479,7 @@ dependencies = [
 [[package]]
 name = "specs-physics"
 version = "0.3.0"
+source = "git+https://github.com/neosam/specs-physics?branch=neosam#7a8dbbf3439514c8550d2ad1a0b952d21e655b0b"
 dependencies = [
  "amethyst_core",
  "amethyst_error",

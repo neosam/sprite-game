@@ -67,26 +67,37 @@ impl<'s> System<'s> for CharacterMoveSystem {
         )
             .join()
         {
+            let mut velocity_x = 0.0;
+            let mut velocity_y = 0.0;
+            let mut movement = false;
             if input.axis_value("player_move_x").unwrap() > 0.0 {
                 character_meta.direction = CharacterDirection::Right;
                 character_meta.moving = true;
-                physics_body.velocity = Velocity3::<f32>::linear(character_move.speed, 0.0, 0.0);
-            } else if input.axis_value("player_move_x").unwrap() < 0.0 {
+                velocity_x += character_move.speed;
+                movement = true;
+            }
+            if input.axis_value("player_move_x").unwrap() < 0.0 {
                 character_meta.direction = CharacterDirection::Left;
                 character_meta.moving = true;
-                physics_body.velocity = Velocity3::<f32>::linear(-character_move.speed, 0.0, 0.0);
-            } else if input.axis_value("player_move_y").unwrap() > 0.0 {
+                velocity_x -= character_move.speed;
+                movement = true;
+            }
+            if input.axis_value("player_move_y").unwrap() > 0.0 {
                 character_meta.direction = CharacterDirection::Up;
                 character_meta.moving = true;
-                physics_body.velocity = Velocity3::linear(0.0, character_move.speed, 0.0);
-            } else if input.axis_value("player_move_y").unwrap() < 0.0 {
+                velocity_y += character_move.speed;
+                movement = true;
+            }
+            if input.axis_value("player_move_y").unwrap() < 0.0 {
                 character_meta.direction = CharacterDirection::Down;
                 character_meta.moving = true;
-                physics_body.velocity = Velocity3::linear(0.0, -character_move.speed, 0.0);
-            } else {
+                velocity_y -= character_move.speed;
+                movement = true;
+            } 
+            if !movement {
                 character_meta.moving = false;
-                physics_body.velocity = Velocity3::linear(0.0, 0.0, 0.0);
             }
+            physics_body.velocity = Velocity3::linear(velocity_x, velocity_y, 0.0);
             // if input.action_is_down("attack").unwrap() {
             //     let transform: Transform = transform.clone();
             //     let bounding_rect: BoundingRect = bounding_rect.clone();

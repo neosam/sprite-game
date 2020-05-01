@@ -15,9 +15,12 @@ use amethyst::{
 };
 use specs_physics::{PhysicsBodyBuilder, PhysicsBody,
     nphysics::object::BodyStatus,
-    nalgebra::Point3,
+    nalgebra::{Point3, Vector3},
     nphysics::{algebra::Velocity3},
     Physics,
+    PhysicsColliderBuilder,
+    PhysicsCollider,
+    colliders::Shape,
 };
 use specs_physics::{bodies::Position, nalgebra::Isometry3};
 /// Assebles a character on the map
@@ -101,8 +104,14 @@ pub fn create_character<'a>(
         .mass(1.0)
         .local_center_of_mass(Point3::new(0.0, 0.0, 0.0))
         .velocity(Velocity3::linear(8.0, 0.0, 0.0))
+        .lock_rotations(true)
         .build();
-
+    let physics_collider: PhysicsCollider<f32> =
+        PhysicsColliderBuilder::from(Shape::Cuboid {
+            half_extents: Vector3::new(15.0, 15.0, 300.0)
+        })
+        .angular_prediction(0.0)
+        .build();
 
     println!("Create character end");
 
@@ -117,6 +126,7 @@ pub fn create_character<'a>(
     //    .with(Physics::new())
     //    .with(BoundingRect::new(left, right, bottom, top))
         .with(physics_body)
+        .with(physics_collider)
     
 }
 
@@ -152,10 +162,19 @@ pub fn create_solid<'a>(
     };
     let mut transform = Transform::default();
     transform.set_translation_xyz(x, y, -y);
+    let physics_body: PhysicsBody<f32> = PhysicsBodyBuilder::from(BodyStatus::Static)
+        .build();
+    let physics_collider: PhysicsCollider<f32> =
+        PhysicsColliderBuilder::from(Shape::Cuboid {
+            half_extents: Vector3::new(16.0, 16.0, 300.0)
+        })
+        .build();
 
     entity_builder
         .with(sprite_render)
         .with(transform)
+        .with(physics_body)
+        .with(physics_collider)
     //    .with(BoundingRect::new(left, right, bottom, top))
      //   .with(Transparent)
      //   .with(Solid)
