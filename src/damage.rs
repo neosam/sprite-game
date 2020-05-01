@@ -6,8 +6,6 @@ use amethyst::{
     core::Transform,
 };
 
-use crate::physics::BoundingRect;
-
 
 /// Destroys entities which are destroyable.
 pub struct Destroyer {

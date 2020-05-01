@@ -12,7 +12,7 @@ use regex::Regex;
 use serde::{Deserialize, Serialize};
 use std::collections::BTreeMap;
 
-/// Definintion of one sprite in the RON file.
+/// Definition of one sprite in the RON file.
 #[derive(Debug, Serialize, Deserialize)]
 pub struct SpriteDefinition {
     pub name: String,

@@ -4,6 +4,7 @@ extern crate regex;
 extern crate serde;
 #[macro_use]
 extern crate log;
+extern crate specs_physics;
 
 use amethyst::{
     input::{InputBundle, StringBindings},
@@ -15,21 +16,26 @@ use amethyst::{
     },
     utils::application_root_dir,
 };
+use specs_physics:: {
+    nalgebra::RealField,
+    systems::*,
+};
+
 
 
 pub mod characteranimation;
 pub mod charactermeta;
 pub mod charactermove;
-pub mod damage;
+// pub mod damage;
 pub mod delayedremove;
 pub mod helper;
 pub mod physics;
 pub mod spriteanimation;
 pub mod spriteanimationloader;
-pub mod swordattack;
+// pub mod swordattack;
 pub mod room;
 pub mod map;
-pub mod roomexit;
+// pub mod roomexit;
 // pub mod simpleenemy;
 
 struct Example {
@@ -55,7 +61,7 @@ impl SimpleState for Example {
     }
 
     fn update(&mut self, game_state: &mut StateData<GameData>) -> SimpleTrans {
-        use crate::roomexit::PerformRoomExit;
+        /*use crate::roomexit::PerformRoomExit;
         let mut trans = SimpleTrans::None;
         {
             let mut perform_room_exits = game_state.world.fetch_mut::<Option<roomexit::PerformRoomExit>>();
@@ -76,7 +82,8 @@ impl SimpleState for Example {
         } else {
             game_state.world.delete_all();
             trans
-        }
+        }*/
+        SimpleTrans::None
     }
 }
 
@@ -137,7 +144,7 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                     pixel_pos,
                     hitbox,
                     "bush",
-                ).with(damage::Destroyable { health: 2.0 })
+                )//.with(damage::Destroyable { health: 2.0 })
                 .build();
             },
             room::RoomField::Player => {
@@ -160,7 +167,7 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
                     pixel_pos,
                     (-1.0, 1.0, -1.0, 1.0),
                 )
-                .with(direction)
+                //.with(direction)
                 // .with(damage::Destroyer { damage: 1.0})
                 .build();
             },
@@ -178,7 +185,7 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
             hitbox,
             "healer",
         )
-        .with(charactermove::UserMove)
+        //.with(charactermove::UserMove)
         // .with(damage::Destroyer { damage: 1.0})
         .build();
     }
@@ -203,8 +210,8 @@ fn main() -> amethyst::Result<()> {
     let game_data = GameDataBuilder::default()
         .with_bundle(TransformBundle::new())?
         .with_bundle(input_bundle)?
-        .with(physics::PhysicsSystem, "physics", &[])
-        .with(roomexit::RoomExitSystem::default(), "roomexit", &["physics"])
+        //.with(physics::PhysicsSystem, "physics", &[])
+        //.with(roomexit::RoomExitSystem::default(), "roomexit", &["physics"])
         .with(
             spriteanimation::SpriteAnimationSystem,
             "sprite_animation",
@@ -216,8 +223,32 @@ fn main() -> amethyst::Result<()> {
             "character_animation",
             &["sprite_animation", "character_move"],
         )
-        .with(damage::DestroySystem, "destroy", &["physics"])
+        //.with(damage::DestroySystem, "destroy", &["physics"])
         .with(delayedremove::DelayedRemoveSystem, "delayed_remove", &[])
+        .with(SyncBodiesToPhysicsSystem::<f32, Transform>::default(),
+            "sync_bodies_to_physics_system",
+            &["character_move"],
+        )
+        .with(SyncCollidersToPhysicsSystem::<f32, Transform>::default(),
+            "sync_colliders_to_physics_system",
+            &["sync_bodies_to_physics_system"],
+        )
+        .with(SyncParametersToPhysicsSystem::<f32>::default(),
+            "sync_gravity_to_physics_system",
+            &[],
+        )
+        .with(PhysicsStepperSystem::<f32>::default(),
+            "physics_stepper_system",
+            &[
+                "sync_bodies_to_physics_system",
+                "sync_colliders_to_physics_system",
+                "sync_gravity_to_physics_system",
+            ],
+        )
+        .with(SyncBodiesFromPhysicsSystem::<f32, Transform>::default(),
+            "sync_bodies_from_physics_system",
+            &["physics_stepper_system"],
+        )
         .with_bundle(
             RenderingBundle::<DefaultBackend>::new()
                 .with_plugin(

@@ -6,7 +6,7 @@ edition = "2018"
 
 [dependencies]
 #amethyst = {version="0.13", features=["profiler"]}
-amethyst = {version="0.15.0"}
+amethyst = {version="0.15"}
 #amethyst = {version="0.13", path="../amethyst"}
 nalgebra = "0.21"
 serde = "1.0"
@@ -14,6 +14,7 @@ regex = "1.3"
 rand = "0.7"
 env_logger = "0.7"
 log = "0.4"
+specs-physics = {path = "../specs-physics/", version = "0.3", features = ["amethyst"] }
 
 
 

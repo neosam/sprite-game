@@ -4,7 +4,6 @@ use crate::characteranimation::CharacterAnimation;
 use crate::charactermeta::CharacterDirection;
 use crate::charactermeta::CharacterMeta;
 use crate::charactermove::CharacterMove;
-use crate::physics::{BoundingRect, Physics, Solid};
 use crate::spriteanimation::SpriteAnimation;
 use crate::spriteanimationloader::SpriteAnimationStore;
 use amethyst::{
@@ -12,8 +11,15 @@ use amethyst::{
     core::transform::Transform,
     ecs::world::EntityBuilder,
     renderer::{SpriteRender},
+    ecs::Component,
 };
-
+use specs_physics::{PhysicsBodyBuilder, PhysicsBody,
+    nphysics::object::BodyStatus,
+    nalgebra::Point3,
+    nphysics::{algebra::Velocity3},
+    Physics,
+};
+use specs_physics::{bodies::Position, nalgebra::Isometry3};
 /// Assebles a character on the map
 ///
 /// Assigns the components to the EntityBuilder which are required
@@ -91,6 +97,13 @@ pub fn create_character<'a>(
     let mut transform = Transform::default();
     transform.set_translation_xyz(x, y, -y);
 
+    let physics_body: PhysicsBody<f32> = PhysicsBodyBuilder::from(BodyStatus::Dynamic)
+        .mass(1.0)
+        .local_center_of_mass(Point3::new(0.0, 0.0, 0.0))
+        .velocity(Velocity3::linear(8.0, 0.0, 0.0))
+        .build();
+
+
     println!("Create character end");
 
     entity_builder
@@ -101,8 +114,10 @@ pub fn create_character<'a>(
         .with(CharacterMove::new(128.0))
         .with(character_meta)
         .with(character_animation)
-        .with(Physics::new())
-        .with(BoundingRect::new(left, right, bottom, top))
+    //    .with(Physics::new())
+    //    .with(BoundingRect::new(left, right, bottom, top))
+        .with(physics_body)
+    
 }
 
 /// Assebles a solid entity
@@ -141,9 +156,9 @@ pub fn create_solid<'a>(
     entity_builder
         .with(sprite_render)
         .with(transform)
-        .with(BoundingRect::new(left, right, bottom, top))
+    //    .with(BoundingRect::new(left, right, bottom, top))
      //   .with(Transparent)
-        .with(Solid)
+     //   .with(Solid)
 }
 
 pub fn create_walkable_solid<'a>(
@@ -156,9 +171,9 @@ pub fn create_walkable_solid<'a>(
 
     entity_builder
         .with(transform)
-        .with(BoundingRect::new(left, right, bottom, top))
+     //   .with(BoundingRect::new(left, right, bottom, top))
      //   .with(Transparent)
-        .with(Solid)
+     //   .with(Solid)
 }
 
 /// Assebles a walkable entity
@@ -197,6 +212,6 @@ pub fn create_walkable<'a>(
     entity_builder
         .with(sprite_render)
         .with(transform)
-        .with(BoundingRect::new(left, right, bottom, top))
+    //    .with(BoundingRect::new(left, right, bottom, top))
     //    .with(Transparent)
 }
