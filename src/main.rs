@@ -28,7 +28,6 @@ pub mod charactermove;
 pub mod damage;
 pub mod delayedremove;
 pub mod helper;
-pub mod physics;
 pub mod spriteanimation;
 pub mod spriteanimationloader;
 pub mod swordattack;
