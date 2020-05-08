@@ -8,13 +8,15 @@ use specs_physics::{PhysicsBodyBuilder, PhysicsBody,
     PhysicsCollider,
     colliders::Shape,
 };
-use amethyst::{core::Transform, ecs::world::World, prelude::*};
+use amethyst::{core::Transform, ecs::world::World, prelude::*, renderer::SpriteRender};
+use crate::spriteanimationloader::SpriteAnimationStore;
 
 pub fn sword_attack(
     world: &mut World,
     strength: f32,
     transform: Transform,
     direciton: CharacterDirection,
+    sprite: SpriteRender,
 ) {
     let translation = transform.translation();
     let (x, y) = match direciton {
@@ -33,12 +35,14 @@ pub fn sword_attack(
         })
         .sensor(true)
         .build();
+
     world
         .create_entity()
         .with(damage_transform)
-        .with(DelayedRemove::new(0.2))
+        .with(DelayedRemove::new(0.1))
         .with(Destroyer { damage: strength })
         .with(physics_body)
         .with(physics_collider)
+        .with(sprite)
         .build();
 }

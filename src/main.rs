@@ -180,6 +180,7 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
         // .with(damage::Destroyer { damage: 1.0})
         .build();
     }
+    world.insert(sprite_animations);
     info!("Room setup complete");
 }
 
@@ -250,6 +251,7 @@ fn main() -> amethyst::Result<()> {
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?;
+    game_data.disp_builder.print_par_seq();
 
 
     info!("Generate map");

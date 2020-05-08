@@ -2,13 +2,14 @@
 
 use amethyst::core::Transform;
 use amethyst::ecs::{Component, DenseVecStorage, LazyUpdate};
-use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage};
+use amethyst::ecs::{Join, Read, ReadStorage, System, WriteStorage, ReadExpect};
 use amethyst::input::{InputHandler, StringBindings};
 use specs_physics::PhysicsBody;
 use specs_physics::nphysics::algebra::Velocity3;
 
 use crate::charactermeta::{CharacterDirection, CharacterMeta};
 use crate::swordattack::sword_attack;
+use crate::spriteanimationloader::SpriteAnimationStore;
 
 /// Ability to let the character move.
 pub struct CharacterMove {
@@ -52,7 +53,8 @@ impl<'s> System<'s> for CharacterMoveSystem {
         ReadStorage<'s, UserMove>,
         ReadStorage<'s, Transform>,
         Read<'s, InputHandler<StringBindings>>,
-        Read<'s, LazyUpdate>
+        Read<'s, LazyUpdate>,
+        ReadExpect<'s, SpriteAnimationStore>,
     );
 
     fn run(
@@ -65,6 +67,7 @@ impl<'s> System<'s> for CharacterMoveSystem {
             transforms,
             input,
             lazy_update,
+            sprite_animation_store,
         ): Self::SystemData,
     ) {
         for (character_meta, physics_body, character_move, _, transform) in (
@@ -112,8 +115,10 @@ impl<'s> System<'s> for CharacterMoveSystem {
                     self.attack_released = false;
                     let transform: Transform = transform.clone();
                     let direction: CharacterDirection = character_meta.direction.clone();
+                    let sprite_name = format!("sword-attack-{}", direction.as_str());
+                    let sprite = sprite_animation_store.get_sprite_render(&sprite_name).unwrap();
                     lazy_update.exec_mut(move |world| {
-                        sword_attack(world, 1.0, transform, direction);
+                        sword_attack(world, 1.0, transform, direction, sprite);
                     });
                 }
             } else {

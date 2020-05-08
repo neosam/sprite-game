@@ -14,6 +14,17 @@ pub enum CharacterDirection {
     Down,
 }
 
+impl CharacterDirection {
+    pub fn as_str(&self) -> &'static str {
+        match self {
+            CharacterDirection::Left => "left",
+            CharacterDirection::Right => "right",
+            CharacterDirection::Up => "up",
+            CharacterDirection::Down => "down",
+        }
+    }
+}
+
 /// Component which holds information for characters.
 #[derive(Clone, PartialEq, Eq)]
 pub struct CharacterMeta {

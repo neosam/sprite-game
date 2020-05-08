@@ -1,53 +1,29 @@
 (
     texture_path: "tp-export.png",
     texture_width: 102,
-    texture_height: 186,
+    texture_height: 238,
     sprites: [
-        
-        (
-            name: "brick",
-            x: 1,
-            y: 1,
-            width: 32,
-            height: 32,
-        ),
-        
-        (
-            name: "bush",
-            x: 35,
-            y: 1,
-            width: 32,
-            height: 32,
-        ),
-        
-        (
-            name: "stones",
-            x: 69,
-            y: 1,
-            width: 32,
-            height: 32,
-        ),
         
         (
             name: "healer_walk_down_001",
             x: 1,
-            y: 35,
+            y: 1,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_down_002",
-            x: 35,
-            y: 35,
+            x: 1,
+            y: 39,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_down_003",
-            x: 69,
-            y: 35,
+            x: 1,
+            y: 77,
             width: 32,
             height: 36,
         ),
@@ -55,31 +31,31 @@
         (
             name: "healer_walk_left_001",
             x: 1,
-            y: 73,
+            y: 115,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_left_002",
-            x: 35,
-            y: 73,
+            x: 1,
+            y: 153,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_left_003",
-            x: 69,
-            y: 73,
+            x: 1,
+            y: 191,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_right_001",
-            x: 1,
-            y: 111,
+            x: 35,
+            y: 1,
             width: 32,
             height: 36,
         ),
@@ -87,23 +63,23 @@
         (
             name: "healer_walk_right_002",
             x: 35,
-            y: 111,
+            y: 39,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_right_003",
-            x: 69,
-            y: 111,
+            x: 35,
+            y: 77,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_up_001",
-            x: 1,
-            y: 149,
+            x: 35,
+            y: 115,
             width: 32,
             height: 36,
         ),
@@ -111,17 +87,73 @@
         (
             name: "healer_walk_up_002",
             x: 35,
-            y: 149,
+            y: 153,
             width: 32,
             height: 36,
         ),
         
         (
             name: "healer_walk_up_003",
-            x: 69,
-            y: 149,
+            x: 35,
+            y: 191,
             width: 32,
             height: 36,
+        ),
+        
+        (
+            name: "brick",
+            x: 69,
+            y: 1,
+            width: 32,
+            height: 32,
+        ),
+        
+        (
+            name: "bush",
+            x: 69,
+            y: 35,
+            width: 32,
+            height: 32,
+        ),
+        
+        (
+            name: "stones",
+            x: 69,
+            y: 69,
+            width: 32,
+            height: 32,
+        ),
+        
+        (
+            name: "sword-attack-down",
+            x: 69,
+            y: 103,
+            width: 32,
+            height: 32,
+        ),
+        
+        (
+            name: "sword-attack-left",
+            x: 69,
+            y: 137,
+            width: 32,
+            height: 32,
+        ),
+        
+        (
+            name: "sword-attack-right",
+            x: 69,
+            y: 171,
+            width: 32,
+            height: 32,
+        ),
+        
+        (
+            name: "sword-attack-up",
+            x: 69,
+            y: 205,
+            width: 32,
+            height: 32,
         ),
         
     ],

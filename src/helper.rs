@@ -147,10 +147,7 @@ pub fn create_solid<'a>(
     (x, y): (f32, f32),
     name: &str,
 ) -> EntityBuilder<'a> {
-    let sprite_render = SpriteRender {
-        sprite_sheet: animations.sprite_sheet_handle.clone(),
-        sprite_number: *animations.images.get(name).unwrap_or(&0),
-    };
+    let sprite_render = animations.get_sprite_render(name).unwrap();
     let mut transform = Transform::default();
     transform.set_translation_xyz(x, y, -y);
     let physics_body: PhysicsBody<f32> = PhysicsBodyBuilder::from(BodyStatus::Static)

@@ -1,0 +1,136 @@
+//
+//  Sprite sheet data for Amethyst Game Engine: https://www.amethyst.rs
+//  This file was created by TexturePacker: https://www.codeandweb.com/texturepacker
+//
+//  $TexturePacker:SmartUpdate:0050bcf876f58c944e3a09540301bf2e:c2160805739a5bc5a854be5a9d3a6b50:55b0894b209d4c923bf796f8077c5d0c$
+//
+
+#![enable(implicit_some)]
+(
+    texture_path: "export.png"
+    texture_width: 462,
+    texture_height: 37,
+    sprites: [
+        (
+            // 0: brick.png
+            x: 361,
+            y: 1,
+            width: 32,
+            height: 32,
+            offsets: (0, 0),
+        ),
+        (
+            // 1: bush.png
+            x: 395,
+            y: 1,
+            width: 32,
+            height: 32,
+            offsets: (0, 0),
+        ),
+        (
+            // 2: healer_walk_down_001.png
+            x: 1,
+            y: 1,
+            width: 30,
+            height: 35,
+            offsets: (0, 0.5),
+        ),
+        (
+            // 3: healer_walk_down_002.png
+            x: 33,
+            y: 1,
+            width: 30,
+            height: 35,
+            offsets: (0, -0.5),
+        ),
+        (
+            // 4: healer_walk_down_003.png
+            x: 65,
+            y: 1,
+            width: 30,
+            height: 35,
+            offsets: (0, 0.5),
+        ),
+        (
+            // 5: healer_walk_left_001.png
+            x: 193,
+            y: 1,
+            width: 26,
+            height: 35,
+            offsets: (-2, 0.5),
+        ),
+        (
+            // 6: healer_walk_left_002.png
+            x: 221,
+            y: 1,
+            width: 26,
+            height: 35,
+            offsets: (-2, -0.5),
+        ),
+        (
+            // 7: healer_walk_left_003.png
+            x: 249,
+            y: 1,
+            width: 26,
+            height: 35,
+            offsets: (-2, 0.5),
+        ),
+        (
+            // 8: healer_walk_right_001.png
+            x: 277,
+            y: 1,
+            width: 26,
+            height: 35,
+            offsets: (2, 0.5),
+        ),
+        (
+            // 9: healer_walk_right_002.png
+            x: 305,
+            y: 1,
+            width: 26,
+            height: 35,
+            offsets: (2, -0.5),
+        ),
+        (
+            // 10: healer_walk_right_003.png
+            x: 333,
+            y: 1,
+            width: 26,
+            height: 35,
+            offsets: (2, 0.5),
+        ),
+        (
+            // 11: healer_walk_up_001.png
+            x: 97,
+            y: 1,
+            width: 30,
+            height: 35,
+            offsets: (0, 0.5),
+        ),
+        (
+            // 12: healer_walk_up_002.png
+            x: 129,
+            y: 1,
+            width: 30,
+            height: 35,
+            offsets: (0, -0.5),
+        ),
+        (
+            // 13: healer_walk_up_003.png
+            x: 161,
+            y: 1,
+            width: 30,
+            height: 35,
+            offsets: (0, 0.5),
+        ),
+        (
+            // 14: stones.png
+            x: 429,
+            y: 1,
+            width: 32,
+            height: 32,
+            offsets: (0, 0),
+        )
+    ]
+)
+

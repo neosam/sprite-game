@@ -5,7 +5,7 @@ use amethyst::{
     config::Config,
     prelude::*,
     renderer::{ImageFormat, Sprite, SpriteSheet, /*SpriteSheetHandle,*/ Texture, /*TextureMetadata*/
-        sprite::SpriteSheetHandle,
+        sprite::SpriteSheetHandle, SpriteRender,
     },
 };
 use regex::Regex;
@@ -53,6 +53,16 @@ pub struct SpriteAnimationStore {
     pub sprite_sheet_handle: SpriteSheetHandle,
     pub animations: BTreeMap<String, Vec<usize>>,
     pub images: BTreeMap<String, usize>,
+}
+
+impl SpriteAnimationStore {
+    pub fn get_sprite_render(&self, name: &str) -> Option<SpriteRender> {
+        self.images.get(name)
+            .map(|index| SpriteRender {
+                sprite_sheet: self.sprite_sheet_handle.clone(),
+                sprite_number: *index
+            })
+    }
 }
 
 /// Use an AnimationData and create animations and sprite images based on sprite names.
