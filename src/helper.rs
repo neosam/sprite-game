@@ -6,6 +6,7 @@ use crate::charactermeta::CharacterMeta;
 use crate::charactermove::CharacterMove;
 use crate::spriteanimation::SpriteAnimation;
 use crate::spriteanimationloader::SpriteAnimationStore;
+use crate::forces::RadialForceField;
 use amethyst::{
     prelude::*,
     core::transform::Transform,
@@ -119,6 +120,7 @@ pub fn create_character<'a>(
     //    .with(BoundingRect::new(left, right, bottom, top))
         .with(physics_body)
         .with(physics_collider)
+        .with(RadialForceField::new(200000.0))
     
 }
 

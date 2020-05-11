@@ -9,7 +9,6 @@ use specs_physics::{PhysicsBodyBuilder, PhysicsBody,
     colliders::Shape,
 };
 use amethyst::{core::Transform, ecs::world::World, prelude::*, renderer::SpriteRender};
-use crate::spriteanimationloader::SpriteAnimationStore;
 
 pub fn sword_attack(
     world: &mut World,

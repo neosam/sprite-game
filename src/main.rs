@@ -34,6 +34,8 @@ pub mod swordattack;
 pub mod room;
 pub mod map;
 pub mod roomexit;
+pub mod forces;
+pub mod randomparticles;
 // pub mod simpleenemy;
 
 struct Example {
@@ -210,6 +212,15 @@ fn main() -> amethyst::Result<()> {
             "sprite_animation",
             &[],
         )
+        .with(randomparticles::SpawnParticleSystem {
+            average_part_spawn: 1.0,
+            min_x: 0.0,
+            max_x: 640.0,
+            min_y: 0.0,
+            max_y: 480.0,
+            lifespan: 5.0,
+        }, "spawn_particle_system", &[])
+        .with(forces::ForceSystem, "force_system", &[])
         .with(charactermove::CharacterMoveSystem::default(), "character_move", &[])
         .with(
             characteranimation::CharacterAnimationSystem,
@@ -251,7 +262,6 @@ fn main() -> amethyst::Result<()> {
                 )
                 .with_plugin(RenderFlat2D::default()),
         )?;
-    game_data.disp_builder.print_par_seq();
 
 
     info!("Generate map");

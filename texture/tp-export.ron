@@ -53,6 +53,14 @@
         ),
         
         (
+            name: "particle",
+            x: 1,
+            y: 229,
+            width: 4,
+            height: 4,
+        ),
+        
+        (
             name: "healer_walk_right_001",
             x: 35,
             y: 1,
