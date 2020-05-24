@@ -15,6 +15,9 @@ use amethyst::{
         types::DefaultBackend,
     },
     utils::application_root_dir,
+    ecs,
+    core::bundle::SystemBundle,
+    core::ArcThreadPool,
 };
 use specs_physics:: {
     systems::*,
@@ -38,21 +41,97 @@ pub mod forces;
 pub mod randomparticles;
 // pub mod simpleenemy;
 
-struct Example {
+struct Example<'a, 'b> {
     map: map::Map<room::Room>,
     room_coordinate: map::Coordinate,
     spawn_player: Option<(i32, i32)>,
+
+    dispatcher: Option<ecs::Dispatcher<'a, 'b>>,
 }
 
 pub const ARENA_WIDTH: f32 = 640.0;
 pub const ARENA_HEIGHT: f32 = 480.0;
 
-impl SimpleState for Example {
+impl<'a, 'b> SimpleState for Example<'a, 'b> {
     fn on_start(&mut self, data: StateData<'_, GameData<'_, '_>>) {
         let world = data.world;
 
         //world.register::<SpriteRender>();
         //world.register::<Transparent>();
+
+        let app_root = application_root_dir().unwrap();
+        //let path = format!("{}/resources/display_config.ron", root_dir);
+        let binding_path = app_root.join("resources/binding_config.ron");
+        let display_config_path = app_root.join("resources/display_config.ron");
+        let input_bundle =
+            InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path).unwrap();
+
+        let mut dispatcher_builder = ecs::DispatcherBuilder::new();
+        input_bundle.build(world, &mut dispatcher_builder).unwrap();
+        //.with_bundle(input_bundle)?
+        //.with(physics::PhysicsSystem, "physics", &[])
+        let mut dispatcher_builder =
+                dispatcher_builder.with(delayedremove::DelayedRemoveSystem, "delayed_remove", &[])
+            .with(
+                spriteanimation::SpriteAnimationSystem,
+                "sprite_animation",
+                &[],
+            )
+            .with(randomparticles::SpawnParticleSystem {
+                average_part_spawn: 0.01,
+                min_x: 0.0,
+                max_x: 640.0,
+                min_y: 0.0,
+                max_y: 480.0,
+                lifespan: 5.0,
+            }, "spawn_particle_system", &[])
+            .with(forces::ForceSystem, "force_system", &[])
+            .with(charactermove::CharacterMoveSystem::default(), "character_move", &[])
+            .with(
+                characteranimation::CharacterAnimationSystem,
+                "character_animation",
+                &["sprite_animation", "character_move"],
+            )
+            
+            .with(SyncBodiesToPhysicsSystem::<f32, Transform>::default(),
+                "sync_bodies_to_physics_system",
+                &["character_move", "delayed_remove"],
+            )
+            .with(SyncCollidersToPhysicsSystem::<f32, Transform>::default(),
+                "sync_colliders_to_physics_system",
+                &["sync_bodies_to_physics_system"],
+            )
+            .with(SyncParametersToPhysicsSystem::<f32>::default(),
+                "sync_gravity_to_physics_system",
+                &[],
+            )
+            .with(PhysicsStepperSystem::<f32>::default(),
+                "physics_stepper_system",
+                &[
+                    "sync_bodies_to_physics_system",
+                    "sync_colliders_to_physics_system",
+                    "sync_gravity_to_physics_system",
+                ],
+            )
+            .with(SyncBodiesFromPhysicsSystem::<f32, Transform>::default(),
+                "sync_bodies_from_physics_system",
+                &["physics_stepper_system"],
+            )
+            .with(roomexit::RoomExitSystem::new(world), "roomexit", &["sync_bodies_from_physics_system"])
+            .with(damage::DestroySystem::default(), "destroy", &["sync_bodies_from_physics_system"]);
+        RenderingBundle::<DefaultBackend>::new()
+                .with_plugin(
+                    RenderToWindow::from_config_path(display_config_path).unwrap()
+                        .with_clear([0.34, 0.36, 0.52, 1.0]),
+                )
+                .with_plugin(RenderFlat2D::default())
+                .build(world, &mut dispatcher_builder).unwrap();
+        
+        let mut dispatcher = dispatcher_builder
+                .with_pool((*world.read_resource::<ArcThreadPool>()).clone())
+                .build();
+        dispatcher.setup(world);
+        self.dispatcher = Some(dispatcher);
 
         info!("Initialize camera");
         initialise_camera(world);
@@ -62,27 +141,32 @@ impl SimpleState for Example {
 
     fn update(&mut self, game_state: &mut StateData<GameData>) -> SimpleTrans {
         use crate::roomexit::PerformRoomExit;
-        let mut trans = SimpleTrans::None;
-        {
+
+        if let Some(dispatcher) = self.dispatcher.as_mut() {
+            dispatcher.dispatch(&game_state.world);
+        }
+
+
+        let reset_all = {
             let mut perform_room_exits = game_state.world.fetch_mut::<Option<roomexit::PerformRoomExit>>();
             if let Some(PerformRoomExit(dest_room, spawn_coordinates)) = &*perform_room_exits {
                 let room_coordinate = dest_room.to_absolute_coordinates(self.room_coordinate);
                 println!("New coordinate: {:?}", room_coordinate);
-                let new_state = Example {
-                    map: self.map.clone(),
-                    room_coordinate,
-                    spawn_player: Some(*spawn_coordinates),
-                };
+                self.room_coordinate = room_coordinate;
+                self.spawn_player = Some(*spawn_coordinates);
                 *perform_room_exits = None;
-                trans = SimpleTrans::Push(Box::new(new_state))
+                
+                true
+            } else {
+                false
             }
-        }
-        if let SimpleTrans::None = trans {
-            trans
-        } else {
+        };
+        if reset_all {
             game_state.world.delete_all();
-            trans
+            initialise_camera(game_state.world);
+            initialize_test_sprite(self, game_state.world);
         }
+        SimpleTrans::None
     }
 }
 
@@ -189,79 +273,9 @@ fn initialize_test_sprite(scene: &Example, world: &mut World) {
 fn main() -> amethyst::Result<()> {
     amethyst::start_logger(Default::default());
     info!("starting up");
-
-
-    let app_root = application_root_dir()?;
-    //let path = format!("{}/resources/display_config.ron", root_dir);
-    let binding_path = app_root.join("resources/binding_config.ron");
-    let display_config_path = app_root.join("resources/display_config.ron");
-    info!("binding_path: {:?}", binding_path.to_str());
-
-    let input_bundle =
-        InputBundle::<StringBindings>::new().with_bindings_from_file(binding_path)?;
-
-    info!("Info bundle loaded");
   
     let game_data = GameDataBuilder::default()
-        .with_bundle(TransformBundle::new())?
-        .with_bundle(input_bundle)?
-        //.with(physics::PhysicsSystem, "physics", &[])
-        .with(delayedremove::DelayedRemoveSystem, "delayed_remove", &[])
-        .with(
-            spriteanimation::SpriteAnimationSystem,
-            "sprite_animation",
-            &[],
-        )
-        .with(randomparticles::SpawnParticleSystem {
-            average_part_spawn: 1.0,
-            min_x: 0.0,
-            max_x: 640.0,
-            min_y: 0.0,
-            max_y: 480.0,
-            lifespan: 5.0,
-        }, "spawn_particle_system", &[])
-        .with(forces::ForceSystem, "force_system", &[])
-        .with(charactermove::CharacterMoveSystem::default(), "character_move", &[])
-        .with(
-            characteranimation::CharacterAnimationSystem,
-            "character_animation",
-            &["sprite_animation", "character_move"],
-        )
-        
-        .with(SyncBodiesToPhysicsSystem::<f32, Transform>::default(),
-            "sync_bodies_to_physics_system",
-            &["character_move", "delayed_remove"],
-        )
-        .with(SyncCollidersToPhysicsSystem::<f32, Transform>::default(),
-            "sync_colliders_to_physics_system",
-            &["sync_bodies_to_physics_system"],
-        )
-        .with(SyncParametersToPhysicsSystem::<f32>::default(),
-            "sync_gravity_to_physics_system",
-            &[],
-        )
-        .with(PhysicsStepperSystem::<f32>::default(),
-            "physics_stepper_system",
-            &[
-                "sync_bodies_to_physics_system",
-                "sync_colliders_to_physics_system",
-                "sync_gravity_to_physics_system",
-            ],
-        )
-        .with(SyncBodiesFromPhysicsSystem::<f32, Transform>::default(),
-            "sync_bodies_from_physics_system",
-            &["physics_stepper_system"],
-        )
-        .with(roomexit::RoomExitSystem::default(), "roomexit", &["sync_bodies_from_physics_system"])
-        .with(damage::DestroySystem::default(), "destroy", &["sync_bodies_from_physics_system"])
-        .with_bundle(
-            RenderingBundle::<DefaultBackend>::new()
-                .with_plugin(
-                    RenderToWindow::from_config_path(display_config_path)?
-                        .with_clear([0.34, 0.36, 0.52, 1.0]),
-                )
-                .with_plugin(RenderFlat2D::default()),
-        )?;
+        .with_bundle(TransformBundle::new())?;
 
 
     info!("Generate map");
@@ -271,6 +285,7 @@ fn main() -> amethyst::Result<()> {
         map: build_map(tiles_x, tiles_y),
         room_coordinate: (0, 0),
         spawn_player: None,
+        dispatcher: None,
     };
 
     info!("Create game");

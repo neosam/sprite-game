@@ -1,8 +1,7 @@
 //! Handle damages
 
 use amethyst::{
-    ecs::{ReadStorage, System, WriteStorage, Component, DenseVecStorage, Entities, Write,
-    ReadExpect},
+    ecs::{ReadStorage, System, WriteStorage, Component, DenseVecStorage, Entities, Write},
 };
 use specs_physics::events::{ProximityEvent, ProximityEvents};
 use amethyst::core::shrev::{ReaderId};

@@ -120,7 +120,7 @@ pub fn create_character<'a>(
     //    .with(BoundingRect::new(left, right, bottom, top))
         .with(physics_body)
         .with(physics_collider)
-        .with(RadialForceField::new(200000.0))
+        .with(RadialForceField::new(20000000.0))
     
 }
 

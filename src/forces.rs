@@ -1,9 +1,9 @@
 use amethyst::{
     core::Transform,
-    ecs::{Component, DenseVecStorage, Entities, Join, System, WriteStorage, ReadStorage},
+    ecs::{Component, DenseVecStorage, Join, System, WriteStorage, ReadStorage},
 };
 use specs_physics::PhysicsBody;
-use nalgebra::{Point3, Vector3};
+use nalgebra::{Point3};
 use nalgebra::distance;
 use specs_physics::nphysics::algebra::Force3;
 
@@ -44,7 +44,6 @@ impl<'s> System<'s> for ForceSystem {
                     let force_vector = (body_position - force_position)
                         .normalize() * applied_force_abs; 
                     let force = Force3::linear(force_vector);
-                    info!("Apply force {}", force_vector);
                     physics.apply_external_force(&force);
                 }
             }
